@@ -161,7 +161,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       </div>
 
                       <div className="font-semibold text-sm text-[#090100]">
-                        ${(item.product.price * item.quantity).toLocaleString()} USD
+                        ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
                       </div>
                     </div>
                   </div>
@@ -176,7 +176,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="space-y-1.5 text-xs text-[#504440]">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-semibold text-[#090100] text-sm">${subtotal.toLocaleString()} USD</span>
+                  <span className="font-semibold text-[#090100] text-sm">₹{subtotal.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Insured Global Courier</span>
@@ -240,7 +240,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <form onSubmit={handleCheckoutSubmit} className="space-y-4">
                 <div className="text-center pb-2 border-b border-[#d3c3be]/40">
                   <h3 className="font-display font-bold text-lg text-[#090100]">Al Sumora Checkout</h3>
-                  <p className="text-xs text-[#825425]">Total Due: ${subtotal.toLocaleString()} USD</p>
+                  <p className="text-xs text-[#825425]">Total Due: ₹{subtotal.toLocaleString('en-IN')}</p>
                 </div>
 
                 <div className="space-y-3">
@@ -268,7 +268,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   type="submit"
                   className="w-full mt-4 bg-[#090100] hover:bg-[#825425] text-white py-3 rounded text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
                 >
-                  Complete Order (${subtotal.toLocaleString()})
+                  Complete Order (₹{subtotal.toLocaleString('en-IN')})
                 </button>
               </form>
             )}

@@ -149,7 +149,7 @@ export const BespokeModal: React.FC<BespokeModalProps> = ({
                     <img src={prod.images[0]} alt={prod.name} referrerPolicy="no-referrer" className="w-8 h-8 object-contain bg-white rounded p-0.5" />
                     <div className="truncate">
                       <div className="truncate font-medium">{prod.name}</div>
-                      <div className="text-[10px] opacity-80">${prod.price}</div>
+                      <div className="text-[10px] opacity-80">₹{prod.price.toLocaleString('en-IN')}</div>
                     </div>
                   </button>
                 ))}
@@ -241,7 +241,7 @@ export const BespokeModal: React.FC<BespokeModalProps> = ({
               className="w-full bg-[#090100] hover:bg-[#2c1810] text-white py-3.5 px-6 rounded text-xs font-semibold tracking-wider uppercase flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer"
             >
               <ShoppingBag className="w-4 h-4 text-[#fdc087]" />
-              <span>Add Custom Piece • ${selectedProduct.price.toLocaleString()}</span>
+              <span>Add Custom Piece • ₹{selectedProduct.price.toLocaleString('en-IN')}</span>
             </button>
           </div>
         </div>

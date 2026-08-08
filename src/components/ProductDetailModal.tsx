@@ -230,7 +230,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   {product.name}
                 </h2>
                 <div className="text-xl font-bold text-[#825425] mt-2">
-                  ${product.price.toLocaleString()} USD
+                  ₹{product.price.toLocaleString('en-IN')}
                 </div>
 
                 <p className="text-xs text-[#504440] mt-2.5 leading-relaxed">
@@ -443,7 +443,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               className="flex-1 bg-[#090100] text-white hover:bg-[#2c1810] py-3.5 px-6 rounded-lg text-xs font-semibold tracking-wider uppercase flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
             >
               <ShoppingBag className="w-4 h-4 text-[#fdc087]" />
-              <span>Add to Shopping Bag • ${(product.price * quantity).toLocaleString()}</span>
+              <span>Add to Shopping Bag • ₹{(product.price * quantity).toLocaleString('en-IN')}</span>
             </button>
           </div>
         </div>

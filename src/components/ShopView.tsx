@@ -202,7 +202,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
                     <div>
                       <div className="text-[10px] text-[#827470]">Craft Price</div>
                       <div className="text-base font-bold text-[#825425]">
-                        ${product.price.toLocaleString()} USD
+                        ₹{product.price.toLocaleString('en-IN')}
                       </div>
                     </div>
 

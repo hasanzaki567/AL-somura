@@ -190,7 +190,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <div className="pt-3 border-t border-[#f0eee9] flex items-center justify-between">
                   <div>
                     <div className="text-sm font-bold text-[#825425]">
-                      ${product.price.toLocaleString()} USD
+                      ₹{product.price.toLocaleString('en-IN')}
                     </div>
                     <div className="text-[10px] text-[#827470]">
                       {product.colors.length} Shade{product.colors.length > 1 ? 's' : ''}

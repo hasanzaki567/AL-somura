@@ -91,7 +91,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                       {product.name}
                     </div>
                     <div className="text-xs text-[#825425] font-medium">
-                      {product.category} • ${product.price.toLocaleString()} USD
+                      {product.category} • ₹{product.price.toLocaleString('en-IN')}
                     </div>
                   </div>
                 </div>

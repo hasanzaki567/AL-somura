@@ -53,7 +53,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'sovereign-cafe-racer',
     name: 'The Sovereign Cafe Racer Jacket',
-    price: 1850,
+    price: 154999,
     category: 'Jackets',
     isFeatured: true,
     customizable: true,
@@ -79,7 +79,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'atelier-suede-bomber',
     name: 'The Atelier Suede Bomber Jacket',
-    price: 1650,
+    price: 138000,
     category: 'Jackets',
     isFeatured: true,
     customizable: false,
@@ -104,7 +104,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'grandmaster-overcoat',
     name: 'The Grandmaster Leather Overcoat',
-    price: 2200,
+    price: 185000,
     category: 'Jackets',
     isFeatured: false,
     customizable: true,
@@ -130,7 +130,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'handwelted-oxford-shoes',
     name: 'The Sovereign Hand-Welted Oxfords',
-    price: 890,
+    price: 74500,
     category: 'Shoes',
     isFeatured: true,
     customizable: false,
@@ -155,7 +155,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'milanese-monk-strap',
     name: 'The Milanese Double Monk Strap',
-    price: 850,
+    price: 71200,
     category: 'Shoes',
     isFeatured: false,
     customizable: true,
@@ -180,7 +180,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'mayfair-chelsea-boots',
     name: 'The Mayfair Leather Chelsea Boots',
-    price: 920,
+    price: 77000,
     category: 'Shoes',
     isFeatured: true,
     customizable: false,
@@ -206,7 +206,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'executive-briefcase',
     name: 'The Executive Attache Briefcase',
-    price: 1450,
+    price: 121500,
     category: 'Briefcases',
     isFeatured: true,
     customizable: true,
@@ -232,7 +232,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'diplomat-double-zip',
     name: 'The Diplomat Double-Zip Briefcase',
-    price: 1580,
+    price: 132500,
     category: 'Briefcases',
     isFeatured: false,
     customizable: false,
@@ -258,7 +258,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'sovereign-bifold-wallet',
     name: 'The Sovereign Bifold Wallet',
-    price: 320,
+    price: 26800,
     category: 'Wallets',
     isFeatured: true,
     customizable: true,
@@ -282,7 +282,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'atelier-slim-cardholder',
     name: 'The Atelier Slim Cardholder',
-    price: 195,
+    price: 16500,
     category: 'Wallets',
     isFeatured: false,
     customizable: false,
@@ -307,7 +307,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'voyager-heritage-duffel',
     name: 'The Voyager Heritage Duffel',
-    price: 1650,
+    price: 138000,
     category: 'Bags',
     isFeatured: true,
     customizable: true,
@@ -331,7 +331,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'master-structured-tote',
     name: 'The Master Structured Leather Tote',
-    price: 1280,
+    price: 107000,
     category: 'Bags',
     isFeatured: false,
     customizable: false,
@@ -357,7 +357,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'royal-bridle-belt',
     name: 'The Royal Bridle Leather Belt',
-    price: 260,
+    price: 21800,
     category: 'Accessories',
     isFeatured: false,
     customizable: false,

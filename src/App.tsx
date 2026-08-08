@@ -6,7 +6,7 @@ import { HomeView } from './components/HomeView';
 import { ShopView } from './components/ShopView';
 import { AboutView } from './components/AboutView';
 import { ContactView } from './components/ContactView';
-import { ProductDetailModal } from './components/ProductDetailModal';
+import { ProductDetailView } from './components/ProductDetailView';
 import { BespokeModal } from './components/BespokeModal';
 import { CartDrawer } from './components/CartDrawer';
 import { SearchModal } from './components/SearchModal';
@@ -70,7 +70,14 @@ export default function App() {
   const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleOpenCustomization = () => {
+    setSelectedProduct(null);
     setActiveTab('shop');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleTabChange = (tab: ActiveTab) => {
+    setSelectedProduct(null);
+    setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -78,8 +85,8 @@ export default function App() {
     <div className="min-h-screen flex flex-col bg-[#fbf9f4] text-[#1b1c19] font-body selection:bg-[#fdc087] selection:text-[#090100]">
       {/* Header */}
       <Header
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        activeTab={selectedProduct ? 'shop' : activeTab}
+        setActiveTab={handleTabChange}
         cartCount={totalCartCount}
         setIsCartOpen={setIsCartOpen}
         setIsSearchOpen={setIsSearchOpen}
@@ -88,41 +95,48 @@ export default function App() {
 
       {/* Main Content View Switcher */}
       <main className="flex-1">
-        {activeTab === 'home' && (
-          <HomeView
-            setActiveTab={setActiveTab}
-            onSelectProduct={setSelectedProduct}
-            onQuickAddToCart={(prod, color) => handleAddToCart(prod, color, 1)}
-            setIsBespokeOpen={handleOpenCustomization}
+        {selectedProduct ? (
+          <ProductDetailView
+            product={selectedProduct}
+            onBack={() => setSelectedProduct(null)}
+            onAddToCart={handleAddToCart}
           />
+        ) : (
+          <>
+            {activeTab === 'home' && (
+              <HomeView
+                setActiveTab={handleTabChange}
+                onSelectProduct={(product) => {
+                  setSelectedProduct(product);
+                }}
+                onQuickAddToCart={(prod, color) => handleAddToCart(prod, color, 1)}
+                setIsBespokeOpen={handleOpenCustomization}
+              />
+            )}
+
+            {activeTab === 'shop' && (
+              <ShopView
+                onSelectProduct={(product) => {
+                  setSelectedProduct(product);
+                }}
+                onQuickAddToCart={(prod, color) => handleAddToCart(prod, color, 1)}
+                setIsBespokeOpen={handleOpenCustomization}
+              />
+            )}
+
+            {activeTab === 'about' && <AboutView />}
+
+            {activeTab === 'contact' && <ContactView />}
+          </>
         )}
-
-        {activeTab === 'shop' && (
-          <ShopView
-            onSelectProduct={setSelectedProduct}
-            onQuickAddToCart={(prod, color) => handleAddToCart(prod, color, 1)}
-            setIsBespokeOpen={handleOpenCustomization}
-          />
-        )}
-
-        {activeTab === 'about' && <AboutView />}
-
-        {activeTab === 'contact' && <ContactView />}
       </main>
 
       {/* Footer */}
       <Footer
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         setIsBespokeOpen={handleOpenCustomization}
         onOpenPrivacy={() => setLegalModalTab('privacy')}
         onOpenTerms={() => setLegalModalTab('terms')}
-      />
-
-      {/* Product Detail / Customization Modal */}
-      <ProductDetailModal
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-        onAddToCart={handleAddToCart}
       />
 
       {/* Slide-out Shopping Bag Drawer */}
