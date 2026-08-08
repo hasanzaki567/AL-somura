@@ -154,7 +154,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, onOpenPrivacy, onO
               </li>
               <li>
                 <button onClick={() => { setActiveTab('contact'); window.scrollTo(0,0); }} className="hover:text-white transition-colors">
-                  Private Appointments
+                  Concierge Inquiry Desk
                 </button>
               </li>
             </ul>

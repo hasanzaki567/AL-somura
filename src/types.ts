@@ -17,6 +17,7 @@ export interface Product {
   colors: ProductColor[];
   boutiques: string[]; // e.g. ['paris', 'milan', 'london']
   isFeatured?: boolean;
+  customizable?: boolean;
 }
 
 export interface MonogramConfig {

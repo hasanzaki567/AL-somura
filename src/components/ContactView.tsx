@@ -15,13 +15,13 @@ export const ContactView: React.FC = () => {
       {/* Page Title */}
       <div className="text-center max-w-2xl mx-auto space-y-3">
         <span className="text-xs font-semibold uppercase tracking-widest text-[#825425]">
-          Private Appointments & Concierge Desk
+          Maison Concierge Desk
         </span>
         <h1 className="font-display font-bold text-3xl sm:text-4xl text-[#090100]">
           Connect with the Maison
         </h1>
         <p className="text-xs sm:text-sm text-[#504440] leading-relaxed">
-          Whether inquiring about a bespoke leather commission, scheduling a private consultation, or seeking product advice, our concierges are at your service.
+          Whether inquiring about a bespoke leather commission or seeking product advice, our concierges are at your service.
         </p>
       </div>
 

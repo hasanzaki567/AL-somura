@@ -26,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'home', label: 'Home' },
     { id: 'shop', label: 'Shop Collection' },
     { id: 'about', label: 'About Us' },
-    { id: 'contact', label: 'Contact & Appointments' },
+    { id: 'contact', label: 'Contact Desk' },
   ];
 
   const handleNavClick = (tabId: ActiveTab) => {
@@ -37,61 +37,24 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-[#fbf9f4]/90 backdrop-blur-md border-b border-[#d3c3be]/30 transition-all duration-300">
-      {/* Top Banner with Infinite Train Marquee Animation */}
-      <div className="bg-[#090100] text-[#ffffff] text-xs font-body tracking-wider py-2 border-b border-[#2c1810] overflow-hidden whitespace-nowrap">
-        <div className="animate-marquee flex items-center gap-8">
-          <div className="flex items-center gap-8 shrink-0">
-            <span className="text-[#fdc087] font-semibold tracking-widest uppercase flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-[#fdc087]" />
-              COMPLIMENTARY WORLDWIDE EXPRESS SHIPPING
-            </span>
-            <span className="text-[#d3c3be]">•</span>
-            <button
-              onClick={() => { setActiveTab('shop'); window.scrollTo(0, 0); }}
-              className="hover:text-[#fdc087] transition-colors flex items-center gap-2 cursor-pointer font-medium tracking-wide uppercase"
-            >
-              <span>Complimentary Personalization & Bespoke Custom Monogramming</span>
-            </button>
-            <span className="text-[#d3c3be]">•</span>
-            <span className="text-[#fdc087] font-semibold tracking-widest uppercase">
-              HANDCRAFTED IN TUSCANY & PARIS
-            </span>
-            <span className="text-[#d3c3be]">•</span>
-            <button
-              onClick={() => { setActiveTab('contact'); window.scrollTo(0, 0); }}
-              className="hover:text-[#fdc087] transition-colors flex items-center gap-2 cursor-pointer font-medium tracking-wide uppercase text-slate-200"
-            >
-              <span>Private Appointments & Concierge Desk Available</span>
-            </button>
-            <span className="text-[#d3c3be]">•</span>
-          </div>
-
-          {/* Duplicated for seamless loop */}
-          <div className="flex items-center gap-8 shrink-0">
-            <span className="text-[#fdc087] font-semibold tracking-widest uppercase flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-[#fdc087]" />
-              COMPLIMENTARY WORLDWIDE EXPRESS SHIPPING
-            </span>
-            <span className="text-[#d3c3be]">•</span>
-            <button
-              onClick={() => { setActiveTab('shop'); window.scrollTo(0, 0); }}
-              className="hover:text-[#fdc087] transition-colors flex items-center gap-2 cursor-pointer font-medium tracking-wide uppercase"
-            >
-              <span>Complimentary Personalization & Bespoke Custom Monogramming</span>
-            </button>
-            <span className="text-[#d3c3be]">•</span>
-            <span className="text-[#fdc087] font-semibold tracking-widest uppercase">
-              HANDCRAFTED IN TUSCANY & PARIS
-            </span>
-            <span className="text-[#d3c3be]">•</span>
-            <button
-              onClick={() => { setActiveTab('contact'); window.scrollTo(0, 0); }}
-              className="hover:text-[#fdc087] transition-colors flex items-center gap-2 cursor-pointer font-medium tracking-wide uppercase text-slate-200"
-            >
-              <span>Private Appointments & Concierge Desk Available</span>
-            </button>
-            <span className="text-[#d3c3be]">•</span>
-          </div>
+      {/* Stable Static Top Banner */}
+      <div className="bg-[#090100] text-[#ffffff] text-[11px] sm:text-xs font-body tracking-wider py-2 px-4 border-b border-[#2c1810]">
+        <div className="max-w-7xl mx-auto flex items-center justify-center text-center gap-3 sm:gap-6 flex-wrap">
+          <span className="text-[#fdc087] font-semibold tracking-widest uppercase flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-[#fdc087]" />
+            COMPLIMENTARY WORLDWIDE EXPRESS SHIPPING
+          </span>
+          <span className="hidden sm:inline text-[#504440]">•</span>
+          <button
+            onClick={() => { setActiveTab('shop'); window.scrollTo(0, 0); }}
+            className="hover:text-[#fdc087] transition-colors flex items-center gap-1.5 cursor-pointer font-medium tracking-wide uppercase text-slate-200"
+          >
+            <span>Complimentary Custom Monogramming & Engraving</span>
+          </button>
+          <span className="hidden md:inline text-[#504440]">•</span>
+          <span className="hidden md:inline text-[#fdc087] font-semibold tracking-widest uppercase">
+            HANDCRAFTED IN TUSCANY & PARIS
+          </span>
         </div>
       </div>
 

@@ -142,10 +142,16 @@ export const ShopView: React.FC<ShopViewProps> = ({
                     <span className="bg-[#090100]/90 text-white text-[10px] font-semibold px-2.5 py-1 rounded tracking-wider uppercase backdrop-blur-xs">
                       {product.category}
                     </span>
-                    <span className="bg-[#fdc087] text-[#090100] text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-[#090100]" />
-                      Customizable
-                    </span>
+                    {product.customizable !== false ? (
+                      <span className="bg-[#fdc087] text-[#090100] text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-[#090100]" />
+                        Customizable
+                      </span>
+                    ) : (
+                      <span className="bg-[#e4e2dd] text-[#504440] text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase flex items-center gap-1">
+                        Fixed Design
+                      </span>
+                    )}
                   </div>
 
                   {/* Quick Details Eye Button */}

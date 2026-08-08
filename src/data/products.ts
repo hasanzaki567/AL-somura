@@ -56,17 +56,19 @@ export const PRODUCTS: Product[] = [
     price: 1850,
     category: 'Jackets',
     isFeatured: true,
+    customizable: true,
     description: 'Precision-tailored in full-grain Italian Nappa leather. Features heavy-gauge antiqued brass zippers, silk-satin diamond quilted lining, and an ergonomic band collar.',
     details: [
       '100% full-grain Italian Nappa calfskin leather',
       'Quilted silk-satin inner thermal lining',
       'Solid antiqued brass YKK zippers with leather pulls',
       'Two interior welt pockets & zippered sleeve cuffs',
-      'Custom laser engraving or leather tag logo customization available'
+      'Interactive canvas custom drawing & text box engraving available'
     ],
     images: [
       'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Obsidian Black', hex: '#111111', image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1200' },
@@ -80,6 +82,7 @@ export const PRODUCTS: Product[] = [
     price: 1650,
     category: 'Jackets',
     isFeatured: true,
+    customizable: false,
     description: 'Crafted from velvety Spanish goat suede with hand-knit ribbed waist and collar. Designed for effortlessly elevated casual outerwear.',
     details: [
       'Ultra-soft Spanish goat suede',
@@ -89,7 +92,8 @@ export const PRODUCTS: Product[] = [
     ],
     images: [
       'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Cognac Suede', hex: '#8c5e3c', image: 'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?auto=format&fit=crop&q=80&w=1200' },
@@ -103,6 +107,7 @@ export const PRODUCTS: Product[] = [
     price: 2200,
     category: 'Jackets',
     isFeatured: false,
+    customizable: true,
     description: 'Commanding double-breasted coat in supple oiled steerhide. Features hand-stitched lapels, horn buttons, and deep fleece-lined storm pockets.',
     details: [
       'Oiled full-grain steerhide with weather-resistant coat finish',
@@ -111,7 +116,9 @@ export const PRODUCTS: Product[] = [
       'Saddle-stitched belt and back vent'
     ],
     images: [
-      'https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Antique Walnut', hex: '#3d2314', image: 'https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&q=80&w=1200' }
@@ -126,6 +133,7 @@ export const PRODUCTS: Product[] = [
     price: 890,
     category: 'Shoes',
     isFeatured: true,
+    customizable: false,
     description: 'Sartorial dress shoes built using traditional Goodyear welted construction. Hand-patinated French calfskin leather with channeled oak-bark tanned leather soles.',
     details: [
       'Hand-selected full-grain French calfskin',
@@ -135,7 +143,8 @@ export const PRODUCTS: Product[] = [
     ],
     images: [
       'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Espresso Patina', hex: '#2c1810', image: 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?auto=format&fit=crop&q=80&w=1200' },
@@ -149,6 +158,7 @@ export const PRODUCTS: Product[] = [
     price: 850,
     category: 'Shoes',
     isFeatured: false,
+    customizable: true,
     description: 'Sculpted on an elegant almond toe last with hand-polished solid brass buckles and bevelled waist leather soles.',
     details: [
       'Aniline dyed box calf leather',
@@ -157,7 +167,9 @@ export const PRODUCTS: Product[] = [
       'Channeled sole waist'
     ],
     images: [
-      'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Mahogany Brown', hex: '#3d2314', image: 'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&q=80&w=1200' },
@@ -171,6 +183,7 @@ export const PRODUCTS: Product[] = [
     price: 920,
     category: 'Shoes',
     isFeatured: true,
+    customizable: false,
     description: 'Cut from a single piece of flawless cognac calfskin leather with elastic side gussets and sturdy storm-welted rubber lug soles.',
     details: [
       'Wholecut calfskin construction',
@@ -179,7 +192,9 @@ export const PRODUCTS: Product[] = [
       'Soft calfskin leather lining'
     ],
     images: [
-      'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Antique Cognac', hex: '#8c5e3c', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=1200' }
@@ -194,17 +209,19 @@ export const PRODUCTS: Product[] = [
     price: 1450,
     category: 'Briefcases',
     isFeatured: true,
+    customizable: true,
     description: 'Handcrafted in Italy using heavy full-grain Tuscan leather and solid brass key lock hardware. Engineered for laptops up to 16" with luxury suede lining.',
     details: [
       'Full-grain vegetable-tanned Tuscan harness leather',
       'Solid antique brass key-lock hardware',
       'Padded shockproof compartment for 16" laptops',
       'Hand-painted finished edges & waxed thread saddle stitching',
-      'Custom initials or company logo stamping options'
+      'Interactive custom canvas engraving and drawing options'
     ],
     images: [
       'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Tuscan Saddle Tan', hex: '#8c5e3c', image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=1200' },
@@ -218,6 +235,7 @@ export const PRODUCTS: Product[] = [
     price: 1580,
     category: 'Briefcases',
     isFeatured: false,
+    customizable: false,
     description: 'Dual compartment portfolio briefcase with trolley strap, interior pen organizers, and padded tablet sleeve in rich dark espresso leather.',
     details: [
       'Thick full-grain steerhide leather',
@@ -226,7 +244,9 @@ export const PRODUCTS: Product[] = [
       'Removable ergonomic shoulder strap'
     ],
     images: [
-      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Dark Espresso', hex: '#2c1810', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=1200' }
@@ -241,6 +261,7 @@ export const PRODUCTS: Product[] = [
     price: 320,
     category: 'Wallets',
     isFeatured: true,
+    customizable: true,
     description: 'Slim bifold wallet in matte black full-grain leather. Eight card slots, dual full-length note compartments, and gold debossed emblem.',
     details: [
       'Tonal stitching and wax edge coating',
@@ -249,7 +270,9 @@ export const PRODUCTS: Product[] = [
       'RFID blocking internal protection shield'
     ],
     images: [
-      'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Matte Onyx', hex: '#111111', image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&q=80&w=1200' }
@@ -262,6 +285,7 @@ export const PRODUCTS: Product[] = [
     price: 195,
     category: 'Wallets',
     isFeatured: false,
+    customizable: false,
     description: 'Ultra-slim leather card sleeve with five pockets for essential cards and folded cash notes.',
     details: [
       'Fine Italian calf leather',
@@ -270,7 +294,8 @@ export const PRODUCTS: Product[] = [
       'Ultra-thin profile for jacket or shirt pockets'
     ],
     images: [
-      'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Cognac Leather', hex: '#8c5e3c', image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&q=80&w=1200' }
@@ -285,6 +310,7 @@ export const PRODUCTS: Product[] = [
     price: 1650,
     category: 'Bags',
     isFeatured: true,
+    customizable: true,
     description: 'Generous mahogany leather weekender duffel bag with robust rolled handles, detachable padded shoulder strap, and brass lock zippers.',
     details: [
       'Rich deep mahogany hand-waxed leather',
@@ -293,7 +319,9 @@ export const PRODUCTS: Product[] = [
       'Exterior passport pocket & reinforced brass feet'
     ],
     images: [
-      'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Mahogany Brown', hex: '#3d2314', image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=1200' }
@@ -306,6 +334,7 @@ export const PRODUCTS: Product[] = [
     price: 1280,
     category: 'Bags',
     isFeatured: false,
+    customizable: false,
     description: 'Clean architectural tote bag crafted from rich cognac calfskin leather with reinforced shoulder straps and internal zip pouch.',
     details: [
       'Supple full-grain calfskin leather',
@@ -314,7 +343,9 @@ export const PRODUCTS: Product[] = [
       'Matching zipped leather clutch pouch included'
     ],
     images: [
-      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Warm Cognac', hex: '#8c5e3c', image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=1200' }
@@ -329,15 +360,17 @@ export const PRODUCTS: Product[] = [
     price: 260,
     category: 'Accessories',
     isFeatured: false,
+    customizable: false,
     description: 'Burnished tan dress belt crafted from heavy-gauge bridle leather with solid hand-cast brass roller buckle.',
     details: [
       'Solid brass roller buckle with subtle antique sheen',
       '35mm belt width suitable for trousers or denim',
       'Hand-beveled and burnished wax edges',
-      'Custom length fitting available upon request'
+      'Standard sizing options'
     ],
     images: [
-      'https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&q=80&w=1200'
+      'https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&q=80&w=1200',
+      'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&q=80&w=1200'
     ],
     colors: [
       { name: 'Burnished Tan', hex: '#8c5e3c', image: 'https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&q=80&w=1200' },
