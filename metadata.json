@@ -1,0 +1,6 @@
+{
+  "name": "Al Sumora Heritage",
+  "description": "Elite craftsmanship and luxury leather goods store featuring signature collections, bespoke monogramming, and heritage storytelling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
