@@ -168,7 +168,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
                 </div>
 
                 {/* Info & Swatches */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div className="p-5 bg-[#F4F4F4] flex-1 flex flex-col justify-between space-y-4">
                   <div>
                     <h3
                       onClick={() => onSelectProduct(product)}
@@ -176,9 +176,6 @@ export const ShopView: React.FC<ShopViewProps> = ({
                     >
                       {product.name}
                     </h3>
-                    <p className="text-xs text-[#504440] line-clamp-2 mt-1.5 leading-relaxed">
-                      {product.description}
-                    </p>
 
                     {/* Color Swatches */}
                     {product.colors.length > 0 && (

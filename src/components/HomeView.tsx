@@ -177,7 +177,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
 
               {/* Product Info & Actions */}
-              <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+              <div className="p-5 bg-[#F4F4F4] flex-1 flex flex-col justify-between space-y-3">
                 <div>
                   <h3
                     onClick={() => onSelectProduct(product)}
@@ -185,9 +185,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   >
                     {product.name}
                   </h3>
-                  <p className="text-xs text-[#504440] line-clamp-2 mt-1.5 leading-relaxed">
-                    {product.description}
-                  </p>
                 </div>
 
                 <div className="pt-3 border-t border-[#f0eee9] flex items-center justify-between">
