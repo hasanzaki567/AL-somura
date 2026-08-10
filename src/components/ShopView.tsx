@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { Product, Category, ProductColor } from '../types';
-import { PRODUCTS } from '../data/products';
-import { BOUTIQUES } from '../data/boutiques';
-import { Search, Sparkles, Eye, ShoppingBag, Check, Sliders } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Product, ProductColor, Category } from '../types';
+import { Filter, ChevronDown, Eye, Sparkles } from 'lucide-react';
 
 interface ShopViewProps {
   onSelectProduct: (product: Product) => void;
@@ -10,224 +9,249 @@ interface ShopViewProps {
   setIsBespokeOpen?: (open: boolean) => void;
 }
 
+const CATEGORIES: Category[] = ['All', 'Jackets', 'Shoes', 'Briefcases', 'Wallets', 'Bags', 'Accessories'];
+
 export const ShopView: React.FC<ShopViewProps> = ({
   onSelectProduct,
   onQuickAddToCart,
+  setIsBespokeOpen,
 }) => {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<Category>('All');
-  const [selectedBoutique, setSelectedBoutique] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedColorMap, setSelectedColorMap] = useState<Record<string, ProductColor>>({});
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'newest'>('featured');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const categories: Category[] = ['All', 'Jackets', 'Shoes', 'Briefcases', 'Wallets', 'Bags', 'Accessories'];
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const queryParams = new URLSearchParams();
+        if (activeCategory !== 'All') queryParams.append('category', activeCategory);
+        if (search) queryParams.append('search', search);
 
-  const filteredProducts = PRODUCTS.filter((p) => {
-    const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
-    const matchesBoutique = selectedBoutique === 'all' || p.boutiques.includes(selectedBoutique);
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          p.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesBoutique && matchesSearch;
-  });
+        // Fetch from new backend API
+        const res = await fetch(`http://localhost:5000/api/products?${queryParams}`);
+        if (res.ok) {
+          const data = await res.json();
+          // Transform _id to id if necessary, but we'll map it inline
+          setProducts(data.map((p: any) => ({ ...p, id: p._id || p.id })));
+        } else {
+          // Fallback if backend isn't up
+          const { PRODUCTS } = await import('../data/products');
+          setProducts(PRODUCTS);
+        }
+      } catch (error) {
+        // Fallback for development if express server isn't running
+        const { PRODUCTS } = await import('../data/products');
+        setProducts(PRODUCTS);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleColorSelect = (productId: string, color: ProductColor, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedColorMap((prev) => ({ ...prev, [productId]: color }));
-  };
+    fetchProducts();
+  }, [activeCategory, search]);
+
+  const filteredAndSortedProducts = [...products]
+    .filter(p => activeCategory === 'All' || p.category === activeCategory)
+    .sort((a, b) => {
+      if (sortBy === 'price-asc') return a.price - b.price;
+      if (sortBy === 'price-desc') return b.price - a.price;
+      // Default / Featured
+      if (sortBy === 'featured') {
+        if (a.isFeatured && !b.isFeatured) return -1;
+        if (!a.isFeatured && b.isFeatured) return 1;
+      }
+      return 0;
+    });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 pb-24">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-[#d3c3be]/40 pb-6 gap-4">
-        <div>
-          <span className="text-xs font-semibold uppercase tracking-widest text-[#825425]">
-            Maison Catalogue
-          </span>
-          <h1 className="font-display font-bold text-3xl sm:text-4xl text-[#090100] mt-1">
-            Luxury Leather Collection
-          </h1>
-          <p className="text-xs text-[#504440] mt-1">
-            Select any creation to choose leather shades, enter custom name stamping, or attach custom design logos.
+    <div className="bg-[#fbf9f4] min-h-screen pb-20">
+      {/* Header Banner */}
+      <div className="bg-[#090100] text-white py-16 px-4">
+        <div className="max-w-7xl mx-auto text-center space-y-4">
+          <h1 className="font-display font-bold text-4xl tracking-tight">The Complete Collection</h1>
+          <p className="text-[#d3c3be] text-sm max-w-xl mx-auto">
+            Discover our entire range of handcrafted Tuscan leather goods. Each piece is saddle-stitched by master artisans and built to last generations.
           </p>
         </div>
       </div>
 
-      {/* Search & Filter Toolbar */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-[#d3c3be]/40 shadow-xs">
-        {/* Category Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 hide-scrollbar">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                activeCategory === cat
-                  ? 'bg-[#090100] text-white shadow'
-                  : 'bg-[#f0eee9] text-[#504440] hover:bg-[#e4e2dd] hover:text-[#090100]'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          
+          {/* Filters Sidebar (Desktop) & Collapsible (Mobile) */}
+          <div className="w-full lg:w-64 flex-shrink-0">
+            <div className="lg:sticky lg:top-32 space-y-8 bg-white p-6 rounded-xl border border-[#d3c3be]/40 shadow-sm">
+              <div className="flex items-center justify-between lg:hidden" onClick={() => setIsFilterOpen(!isFilterOpen)}>
+                <span className="font-semibold text-sm uppercase tracking-wider text-[#090100] flex items-center gap-2">
+                  <Filter className="w-4 h-4" /> Filters & Categories
+                </span>
+                <ChevronDown className={`w-5 h-5 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+              </div>
 
-        {/* Right Filter Inputs */}
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          {/* Search Box */}
-          <div className="relative flex-1 md:w-64">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#827470]" />
-            <input
-              type="text"
-              placeholder="Search jackets, shoes, briefcases..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#fbf9f4] border border-[#d3c3be]/60 pl-9 pr-3 py-2 text-xs rounded-md focus:outline-none focus:border-[#825425]"
-            />
+              <div className={`${isFilterOpen ? 'block' : 'hidden'} lg:block space-y-8 mt-6 lg:mt-0`}>
+                {/* Categories */}
+                <div>
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#825425] mb-4">Categories</h3>
+                  <div className="flex flex-col gap-2">
+                    {CATEGORIES.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setActiveCategory(cat)}
+                        className={`text-left text-sm py-1.5 transition-colors ${
+                          activeCategory === cat 
+                            ? 'font-semibold text-[#090100] translate-x-1' 
+                            : 'text-[#504440] hover:text-[#825425] hover:translate-x-1'
+                        } transform duration-200`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sort */}
+                <div>
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#825425] mb-4">Sort By</h3>
+                  <select 
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                    className="w-full bg-[#f5f3ee] border border-[#d3c3be]/60 text-sm p-2.5 rounded focus:outline-none focus:border-[#825425]"
+                  >
+                    <option value="featured">Featured First</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="newest">Newest Arrivals</option>
+                  </select>
+                </div>
+
+                {/* Search */}
+                <div>
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#825425] mb-4">Search</h3>
+                  <input
+                    type="text"
+                    placeholder="Search collection..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full bg-[#f5f3ee] border border-[#d3c3be]/60 text-sm p-2.5 rounded focus:outline-none focus:border-[#825425]"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Boutique Dropdown Filter */}
-          <div className="relative">
-            <select
-              value={selectedBoutique}
-              onChange={(e) => setSelectedBoutique(e.target.value)}
-              className="bg-[#fbf9f4] border border-[#d3c3be]/60 text-xs text-[#090100] font-medium py-2 px-3 rounded-md focus:outline-none focus:border-[#825425] cursor-pointer"
-            >
-              <option value="all">All Flagships</option>
-              {BOUTIQUES.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.city} Flagship
-                </option>
-              ))}
-            </select>
+          {/* Product Grid */}
+          <div className="flex-1">
+            <div className="mb-6 flex justify-between items-center text-sm text-[#504440]">
+              <span>Showing <strong>{filteredAndSortedProducts.length}</strong> items {activeCategory !== 'All' ? `in ${activeCategory}` : ''}</span>
+            </div>
+
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                  <div key={i} className="animate-pulse bg-white rounded-xl border border-[#d3c3be]/40 h-[400px]"></div>
+                ))}
+              </div>
+            ) : filteredAndSortedProducts.length === 0 ? (
+              <div className="bg-white rounded-xl border border-[#d3c3be]/40 p-16 text-center shadow-sm">
+                <div className="w-16 h-16 rounded-full bg-[#f0eee9] flex items-center justify-center mx-auto text-[#825425] mb-4">
+                  <Filter className="w-8 h-8" />
+                </div>
+                <h3 className="font-display font-semibold text-xl text-[#090100] mb-2">No products found</h3>
+                <p className="text-sm text-[#504440]">Try adjusting your filters or search terms.</p>
+                <button 
+                  onClick={() => { setActiveCategory('All'); setSearch(''); }}
+                  className="mt-6 text-sm font-semibold text-[#825425] uppercase tracking-wider hover:underline"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredAndSortedProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="group bg-white rounded-xl border border-[#d3c3be]/40 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col"
+                  >
+                    <div
+                      onClick={() => onSelectProduct(product)}
+                      className="w-full aspect-[4/3] bg-[#f5f3ee] relative overflow-hidden flex items-center justify-center cursor-pointer"
+                    >
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                      />
+
+                      {/* Tags */}
+                      <div className="absolute top-3 left-3 flex flex-col gap-2">
+                        <span className="bg-[#090100]/90 text-white text-[10px] font-semibold px-2.5 py-1 rounded tracking-wider uppercase backdrop-blur-xs shadow-sm">
+                          {product.category}
+                        </span>
+                        {product.isFeatured && (
+                          <span className="bg-[#825425]/90 text-white text-[10px] font-semibold px-2.5 py-1 rounded tracking-wider uppercase backdrop-blur-xs shadow-sm flex items-center gap-1">
+                            <Sparkles className="w-3 h-3" /> Featured
+                          </span>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectProduct(product);
+                        }}
+                        className="absolute bottom-3 right-3 p-2.5 bg-white/90 text-[#090100] rounded-full shadow opacity-0 group-hover:opacity-100 transition-all hover:bg-[#825425] hover:text-white"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="p-5 flex-1 flex flex-col justify-between">
+                      <div className="space-y-1">
+                        <h3
+                          onClick={() => onSelectProduct(product)}
+                          className="font-display font-bold text-[#090100] hover:text-[#825425] transition-colors cursor-pointer text-base line-clamp-1"
+                        >
+                          {product.name}
+                        </h3>
+                        <p className="text-xs text-[#504440] line-clamp-2 leading-relaxed">
+                          {product.description}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 pt-4 border-t border-[#f0eee9] flex items-center justify-between">
+                        <div>
+                          <div className="text-sm font-bold text-[#825425]">
+                            ₹{product.price.toLocaleString('en-IN')}
+                          </div>
+                          <div className="text-[10px] text-[#827470] flex gap-1 mt-0.5">
+                            {product.colors.map(c => (
+                              <div key={c.name} className="w-3 h-3 rounded-full border border-[#d3c3be]" style={{ backgroundColor: c.hex }} title={c.name} />
+                            ))}
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => onSelectProduct(product)}
+                          className="px-4 py-2 bg-[#f0eee9] text-[#090100] hover:bg-[#090100] hover:text-white rounded text-[11px] font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                        >
+                          Details
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Product Grid - Perfectly Aligned Containers */}
-      {filteredProducts.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-xl border border-[#d3c3be]/40 space-y-3">
-          <div className="text-[#825425] text-lg font-serif">No creations found matching criteria</div>
-          <p className="text-xs text-[#504440]">Try adjusting your search query or category filter.</p>
-          <button
-            onClick={() => { setActiveCategory('All'); setSelectedBoutique('all'); setSearchQuery(''); }}
-            className="mt-2 text-xs font-semibold text-[#825425] underline cursor-pointer"
-          >
-            Reset Filters
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((product) => {
-            const activeColor = selectedColorMap[product.id] || product.colors[0] || { image: product.images[0], name: 'Standard', hex: '#000' };
-            const displayImage = activeColor.image || product.images[0];
-
-            return (
-              <div
-                key={product.id}
-                className="group bg-white rounded-xl border border-[#d3c3be]/40 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
-              >
-                {/* Uniform Aspect-Ratio Image Container (Eliminates Awkward Empty Gap) */}
-                <div
-                  onClick={() => onSelectProduct(product)}
-                  className="w-full aspect-[4/3] bg-[#f5f3ee] relative overflow-hidden flex items-center justify-center cursor-pointer group"
-                >
-                  <img
-                    src={displayImage}
-                    alt={product.name}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                  />
-
-                  {/* Badges */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-                    <span className="bg-[#090100]/90 text-white text-[10px] font-semibold px-2.5 py-1 rounded tracking-wider uppercase backdrop-blur-xs">
-                      {product.category}
-                    </span>
-                    {product.customizable !== false ? (
-                      <span className="bg-[#fdc087] text-[#090100] text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-[#090100]" />
-                        Customizable
-                      </span>
-                    ) : (
-                      <span className="bg-[#e4e2dd] text-[#504440] text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase flex items-center gap-1">
-                        Fixed Design
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Quick Details Eye Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectProduct(product);
-                    }}
-                    className="absolute bottom-3 right-3 p-2 bg-white/90 text-[#090100] rounded-full shadow opacity-0 group-hover:opacity-100 transition-all hover:bg-[#825425] hover:text-white z-10"
-                    title="Quick Details"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Info & Swatches */}
-                <div className="p-5 bg-[#F4F4F4] flex-1 flex flex-col justify-between space-y-4">
-                  <div>
-                    <h3
-                      onClick={() => onSelectProduct(product)}
-                      className="font-display font-semibold text-base sm:text-lg text-[#090100] hover:text-[#825425] transition-colors cursor-pointer line-clamp-1"
-                    >
-                      {product.name}
-                    </h3>
-
-                    {/* Color Swatches */}
-                    {product.colors.length > 0 && (
-                      <div className="mt-3 flex items-center gap-2">
-                        <span className="text-[10px] uppercase font-semibold text-[#827470]">Shades:</span>
-                        {product.colors.map((c) => (
-                          <button
-                            key={c.name}
-                            onClick={(e) => handleColorSelect(product.id, c, e)}
-                            className={`w-5 h-5 rounded-full border transition-transform cursor-pointer ${
-                              activeColor.name === c.name ? 'border-[#090100] scale-125 shadow ring-1 ring-[#825425]' : 'border-transparent opacity-70 hover:opacity-100'
-                            }`}
-                            style={{ backgroundColor: c.hex }}
-                            title={c.name}
-                          >
-                            {activeColor.name === c.name && <Check className="w-3 h-3 text-white mx-auto" />}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="pt-3 border-t border-[#f0eee9] flex items-center justify-between">
-                    <div>
-                      <div className="text-[10px] text-[#827470]">Craft Price</div>
-                      <div className="text-base font-bold text-[#825425]">
-                        ₹{product.price.toLocaleString('en-IN')}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => onSelectProduct(product)}
-                        className="px-3.5 py-2 bg-[#f0eee9] hover:bg-[#e4e2dd] text-[#090100] rounded text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
-                      >
-                        Details & Custom
-                      </button>
-                      <button
-                        onClick={() => onQuickAddToCart(product, activeColor)}
-                        className="px-3 py-2 bg-[#090100] hover:bg-[#825425] text-white rounded text-xs font-semibold uppercase tracking-wider transition-colors flex items-center gap-1 cursor-pointer"
-                        title="Add to Shopping Bag"
-                      >
-                        <ShoppingBag className="w-3.5 h-3.5 text-[#fdc087]" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 };

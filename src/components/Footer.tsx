@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { ActiveTab } from '../types';
+import { Link } from 'react-router-dom';
 import { LOGO_IMAGE } from '../data/products';
 import { ArrowRight, CheckCircle2, Sparkles, Instagram, Facebook, Phone, MessageCircle, Mail } from 'lucide-react';
 
 interface FooterProps {
-  setActiveTab: (tab: ActiveTab) => void;
   setIsBespokeOpen?: (open: boolean) => void;
   onOpenPrivacy?: () => void;
   onOpenTerms?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ setActiveTab, onOpenPrivacy, onOpenTerms }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -104,29 +103,29 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, onOpenPrivacy, onO
             </h4>
             <ul className="space-y-2 text-xs text-[#d3c3be]">
               <li>
-                <button onClick={() => { setActiveTab('shop'); window.scrollTo(0,0); }} className="hover:text-white transition-colors">
+                <Link to="/shop" onClick={() => window.scrollTo(0,0)} className="hover:text-white transition-colors">
                   All Goods & Leather
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => { setActiveTab('shop'); window.scrollTo(0,0); }} className="hover:text-white transition-colors">
+                <Link to="/shop" onClick={() => window.scrollTo(0,0)} className="hover:text-white transition-colors">
                   Executive Briefcases
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => { setActiveTab('shop'); window.scrollTo(0,0); }} className="hover:text-white transition-colors">
+                <Link to="/shop" onClick={() => window.scrollTo(0,0)} className="hover:text-white transition-colors">
                   Heritage Totes
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => { setActiveTab('shop'); window.scrollTo(0,0); }} className="hover:text-white transition-colors">
+                <Link to="/shop" onClick={() => window.scrollTo(0,0)} className="hover:text-white transition-colors">
                   Fine Wallets & Cardholders
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => { setActiveTab('shop'); window.scrollTo(0,0); }} className="text-[#fdc087] font-semibold hover:underline flex items-center gap-1">
+                <Link to="/shop" onClick={() => window.scrollTo(0,0)} className="text-[#fdc087] font-semibold hover:underline flex items-center gap-1">
                   <Sparkles className="w-3 h-3" /> Customization & Details
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
@@ -138,24 +137,24 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, onOpenPrivacy, onO
             </h4>
             <ul className="space-y-2 text-xs text-[#d3c3be]">
               <li>
-                <button onClick={() => { setActiveTab('about'); window.scrollTo(0,0); }} className="hover:text-white transition-colors">
+                <Link to="/about" onClick={() => window.scrollTo(0,0)} className="hover:text-white transition-colors">
                   Our Heritage & History
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => { setActiveTab('contact'); window.scrollTo(0,0); }} className="hover:text-white transition-colors">
+                <Link to="/contact" onClick={() => window.scrollTo(0,0)} className="hover:text-white transition-colors">
                   Contact & Inquiries
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => { setActiveTab('about'); window.scrollTo(0,0); }} className="hover:text-white transition-colors">
+                <Link to="/about" onClick={() => window.scrollTo(0,0)} className="hover:text-white transition-colors">
                   Artisan Leather Care
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => { setActiveTab('contact'); window.scrollTo(0,0); }} className="hover:text-white transition-colors">
+                <Link to="/contact" onClick={() => window.scrollTo(0,0)} className="hover:text-white transition-colors">
                   Concierge Inquiry Desk
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
@@ -216,6 +215,14 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, onOpenPrivacy, onO
             >
               Terms of Service
             </button>
+            <span className="text-[#504440]">|</span>
+            <Link
+              to="/admin"
+              onClick={() => window.scrollTo(0,0)}
+              className="text-[#504440] hover:text-[#d3c3be] transition-colors cursor-pointer"
+            >
+              Admin Login
+            </Link>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { ActiveTab, Product, ProductColor, MonogramConfig, CartItem } from './types';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Product, ProductColor, MonogramConfig } from './types';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { HomeView } from './components/HomeView';
@@ -11,157 +12,154 @@ import { BespokeModal } from './components/BespokeModal';
 import { CartDrawer } from './components/CartDrawer';
 import { SearchModal } from './components/SearchModal';
 import { LegalModal } from './components/LegalModal';
+import { AuthView } from './components/AuthView';
+import { CheckoutView } from './components/CheckoutView';
+import { AccountView } from './components/AccountView';
+import { AdminView } from './components/AdminView';
+import { useCartStore } from './store/cartStore';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('home');
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
+  const navigate = useNavigate();
+  
   // Modals & Drawers state
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isBespokeOpen, setIsBespokeOpen] = useState(false);
   const [legalModalTab, setLegalModalTab] = useState<'privacy' | 'terms' | null>(null);
 
-  // Cart operations
-  const handleAddToCart = (
-    product: Product,
-    selectedColor: ProductColor,
-    quantity: number,
-    monogram?: MonogramConfig
-  ) => {
-    setCartItems((prev) => {
-      // Check if item with same product ID, color, and monogram already exists
-      const existingIndex = prev.findIndex(
-        (item) =>
-          item.product.id === product.id &&
-          item.selectedColor.name === selectedColor.name &&
-          JSON.stringify(item.monogram) === JSON.stringify(monogram)
-      );
-
-      if (existingIndex > -1) {
-        const updated = [...prev];
-        updated[existingIndex].quantity += quantity;
-        return updated;
-      } else {
-        return [...prev, { product, selectedColor, quantity, monogram }];
-      }
-    });
-
-    setIsCartOpen(true);
-  };
-
-  const handleUpdateQuantity = (index: number, newQty: number) => {
-    setCartItems((prev) => {
-      const updated = [...prev];
-      updated[index].quantity = newQty;
-      return updated;
-    });
-  };
-
-  const handleRemoveItem = (index: number) => {
-    setCartItems((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleClearCart = () => {
-    setCartItems([]);
-  };
-
+  const { cartItems, isCartOpen, setIsCartOpen, addToCart, updateQuantity, removeItem, clearCart } = useCartStore();
   const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleOpenCustomization = () => {
-    setSelectedProduct(null);
-    setActiveTab('shop');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleTabChange = (tab: ActiveTab) => {
-    setSelectedProduct(null);
-    setActiveTab(tab);
+    navigate('/shop');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fbf9f4] text-[#1b1c19] font-body selection:bg-[#fdc087] selection:text-[#090100]">
-      {/* Header */}
       <Header
-        activeTab={selectedProduct ? 'shop' : activeTab}
-        setActiveTab={handleTabChange}
         cartCount={totalCartCount}
         setIsCartOpen={setIsCartOpen}
         setIsSearchOpen={setIsSearchOpen}
-        setIsBespokeOpen={handleOpenCustomization}
+        setIsBespokeOpen={setIsBespokeOpen}
       />
 
-      {/* Main Content View Switcher */}
       <main className="flex-1">
-        {selectedProduct ? (
-          <ProductDetailView
-            product={selectedProduct}
-            onBack={() => setSelectedProduct(null)}
-            onAddToCart={handleAddToCart}
-          />
-        ) : (
-          <>
-            {activeTab === 'home' && (
+        <Routes>
+          <Route 
+            path="/" 
+            element={
               <HomeView
-                setActiveTab={handleTabChange}
-                onSelectProduct={(product) => {
-                  setSelectedProduct(product);
-                }}
-                onQuickAddToCart={(prod, color) => handleAddToCart(prod, color, 1)}
-                setIsBespokeOpen={handleOpenCustomization}
+                setActiveTab={() => {}}
+                onSelectProduct={(product) => navigate(`/product/${product.id}`)}
+                onQuickAddToCart={(prod, color) => addToCart(prod, color, 1)}
+                setIsBespokeOpen={() => setIsBespokeOpen(true)}
               />
-            )}
-
-            {activeTab === 'shop' && (
+            } 
+          />
+          <Route 
+            path="/shop" 
+            element={
               <ShopView
-                onSelectProduct={(product) => {
-                  setSelectedProduct(product);
-                }}
-                onQuickAddToCart={(prod, color) => handleAddToCart(prod, color, 1)}
-                setIsBespokeOpen={handleOpenCustomization}
+                onSelectProduct={(product) => navigate(`/product/${product.id}`)}
+                onQuickAddToCart={(prod, color) => addToCart(prod, color, 1)}
+                setIsBespokeOpen={() => setIsBespokeOpen(true)}
               />
-            )}
-
-            {activeTab === 'about' && <AboutView />}
-
-            {activeTab === 'contact' && <ContactView />}
-          </>
-        )}
+            } 
+          />
+          <Route path="/about" element={<AboutView />} />
+          <Route path="/contact" element={<ContactView />} />
+          <Route 
+            path="/product/:id" 
+            element={
+              <ProductDetailViewWrapper 
+                onBack={() => navigate('/shop')} 
+                onAddToCart={addToCart} 
+              />
+            } 
+          />
+          <Route path="/login" element={<AuthView />} />
+          <Route path="/register" element={<AuthView />} />
+          <Route path="/checkout" element={<CheckoutView />} />
+          <Route path="/account" element={<AccountView />} />
+          <Route path="/admin" element={<AdminView />} />
+        </Routes>
       </main>
 
-      {/* Footer */}
       <Footer
-        setActiveTab={handleTabChange}
-        setIsBespokeOpen={handleOpenCustomization}
+        setIsBespokeOpen={() => setIsBespokeOpen(true)}
         onOpenPrivacy={() => setLegalModalTab('privacy')}
         onOpenTerms={() => setLegalModalTab('terms')}
       />
 
-      {/* Slide-out Shopping Bag Drawer */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cartItems={cartItems}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-        onClearCart={handleClearCart}
+        onUpdateQuantity={updateQuantity}
+        onRemoveItem={removeItem}
+        onClearCart={clearCart}
       />
 
-      {/* Quick Search Modal Overlay */}
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        onSelectProduct={(prod) => setSelectedProduct(prod)}
+        onSelectProduct={(prod) => {
+          setIsSearchOpen(false);
+          navigate(`/product/${prod.id}`);
+        }}
       />
 
-      {/* Legal Privacy Policy & Terms Modal */}
       <LegalModal
         isOpen={legalModalTab !== null}
         onClose={() => setLegalModalTab(null)}
         initialTab={legalModalTab || 'privacy'}
       />
+      
+      {/* BespokeModal requires product/color which isn't managed globally here right now, 
+          assuming it was handled inside views. Will keep as-is if unused at top level. */}
     </div>
   );
+}
+
+// Wrapper to parse the ID from URL and pass to ProductDetailView
+import { useParams } from 'react-router-dom';
+
+function ProductDetailViewWrapper({ onBack, onAddToCart }: any) {
+  const { id } = useParams<{ id: string }>();
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/products/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setProduct({ ...data, id: data._id || data.id });
+        } else {
+          // Fallback
+          const { PRODUCTS } = await import('./data/products');
+          const p = PRODUCTS.find(p => p.id === id);
+          if (p) setProduct(p);
+        }
+      } catch (err) {
+        const { PRODUCTS } = await import('./data/products');
+        const p = PRODUCTS.find(p => p.id === id);
+        if (p) setProduct(p);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return <div className="p-20 text-center">Loading product...</div>;
+  }
+
+  if (!product) {
+    return <div className="p-20 text-center">Product not found</div>;
+  }
+
+  return <ProductDetailView product={product} onBack={onBack} onAddToCart={onAddToCart} />;
 }

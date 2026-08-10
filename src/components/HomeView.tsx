@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Product, ProductColor, ActiveTab } from '../types';
+import { useNavigate } from 'react-router-dom';
+import { Product, ProductColor } from '../types';
 import { PRODUCTS, HERO_SLIDES, CUSTOMIZATION_IMAGES } from '../data/products';
 import { REVIEWS } from '../data/reviews';
 import { ArrowRight, Sparkles, ShieldCheck, Award, Star, Eye, ShoppingBag, ChevronLeft, ChevronRight, Sliders } from 'lucide-react';
 
 interface HomeViewProps {
-  setActiveTab: (tab: ActiveTab) => void;
   onSelectProduct: (product: Product) => void;
   onQuickAddToCart: (product: Product, color: ProductColor) => void;
   setIsBespokeOpen?: (open: boolean) => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
-  setActiveTab,
   onSelectProduct,
   onQuickAddToCart,
 }) => {
+  const navigate = useNavigate();
   const featuredProducts = PRODUCTS.slice(0, 8); // Showcase products across jackets, shoes, briefcases, wallets, bags
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -80,7 +80,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             {/* Single CTA Button - Explore Collection (No Bespoke Button) */}
             <div className="pt-4 flex items-center gap-4">
               <button
-                onClick={() => { setActiveTab('shop'); window.scrollTo(0,0); }}
+                onClick={() => { navigate('/shop'); window.scrollTo(0,0); }}
                 className="bg-[#825425] hover:bg-[#fdc087] hover:text-[#090100] text-white py-4 px-8 rounded-lg text-xs font-semibold tracking-wider uppercase flex items-center justify-center gap-3 transition-all shadow-xl cursor-pointer"
               >
                 <span>Explore Collection</span>
@@ -134,7 +134,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </h2>
           </div>
           <button
-            onClick={() => { setActiveTab('shop'); window.scrollTo(0,0); }}
+            onClick={() => { navigate('/shop'); window.scrollTo(0,0); }}
             className="mt-4 md:mt-0 text-xs font-semibold uppercase tracking-wider text-[#825425] hover:text-[#090100] flex items-center gap-1 cursor-pointer transition-colors"
           >
             <span>View Full Collection</span>
@@ -242,7 +242,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             <div className="pt-4">
               <button
-                onClick={() => { setActiveTab('shop'); window.scrollTo(0,0); }}
+                onClick={() => { navigate('/shop'); window.scrollTo(0,0); }}
                 className="bg-[#fdc087] text-[#090100] hover:bg-white py-3.5 px-8 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all flex items-center gap-2 cursor-pointer shadow-lg"
               >
                 <span>Select a Piece to Customize</span>

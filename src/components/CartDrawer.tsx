@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CartItem } from '../types';
-import { X, Trash2, Plus, Minus, Sparkles, ShieldCheck, Truck, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { X, Trash2, Plus, Minus, Sparkles, ShieldCheck, Truck, ArrowRight } from 'lucide-react';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -19,22 +20,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onRemoveItem,
   onClearCart,
 }) => {
+  const navigate = useNavigate();
   if (!isOpen) return null;
 
-  const [giftNote, setGiftNote] = useState('');
-  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [orderComplete, setOrderComplete] = useState(false);
-
   const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-
-  const handleCheckoutSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setOrderComplete(true);
-    setTimeout(() => {
-      // Auto clear cart after order placement
-      onClearCart();
-    }, 1000);
-  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-[#090100]/60 backdrop-blur-xs animate-in fade-in duration-200">
@@ -189,7 +178,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               </div>
 
               <button
-                onClick={() => setIsCheckoutModalOpen(true)}
+                onClick={() => {
+                  onClose();
+                  navigate('/checkout');
+                }}
                 className="w-full bg-[#090100] hover:bg-[#2c1810] text-white py-3.5 px-6 rounded text-xs font-semibold tracking-wider uppercase flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer"
               >
                 <span>Proceed to Checkout</span>
@@ -204,77 +196,6 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           )}
         </div>
       </div>
-
-      {/* Checkout Order Confirmation Modal */}
-      {isCheckoutModalOpen && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-[#090100]/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-[#fbf9f4] w-full max-w-md p-6 rounded-xl shadow-2xl border border-[#d3c3be]/60 relative text-[#1b1c19]">
-            <button
-              onClick={() => setIsCheckoutModalOpen(false)}
-              className="absolute top-4 right-4 text-[#504440] hover:text-[#090100]"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {orderComplete ? (
-              <div className="text-center py-8 space-y-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-10 h-10" />
-                </div>
-                <h3 className="font-display font-bold text-xl text-[#090100]">Order Placed Successfully</h3>
-                <p className="text-xs text-[#504440]">
-                  Thank you for choosing Al Sumora. Order #AS-{Math.floor(100000 + Math.random() * 900000)} has been registered. You will receive an insured tracking link shortly.
-                </p>
-                <button
-                  onClick={() => {
-                    setIsCheckoutModalOpen(false);
-                    setOrderComplete(false);
-                    onClose();
-                  }}
-                  className="mt-4 px-6 py-2.5 bg-[#090100] text-white text-xs font-semibold uppercase tracking-wider rounded"
-                >
-                  Return to Maison
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleCheckoutSubmit} className="space-y-4">
-                <div className="text-center pb-2 border-b border-[#d3c3be]/40">
-                  <h3 className="font-display font-bold text-lg text-[#090100]">Al Sumora Checkout</h3>
-                  <p className="text-xs text-[#825425]">Total Due: ₹{subtotal.toLocaleString('en-IN')}</p>
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-[10px] font-semibold text-[#504440] uppercase block mb-1">Full Name</label>
-                    <input required type="text" defaultValue="Lord Sterling" className="w-full text-xs p-2 bg-white border border-[#d3c3be] rounded" />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-semibold text-[#504440] uppercase block mb-1">Shipping Address</label>
-                    <input required type="text" defaultValue="42 Mayfair Square, London" className="w-full text-xs p-2 bg-white border border-[#d3c3be] rounded" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-[10px] font-semibold text-[#504440] uppercase block mb-1">Card Number</label>
-                      <input required type="text" defaultValue="•••• •••• •••• 8842" className="w-full text-xs p-2 bg-white border border-[#d3c3be] rounded" />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-semibold text-[#504440] uppercase block mb-1">Expiry / CVC</label>
-                      <input required type="text" defaultValue="11/28 - 942" className="w-full text-xs p-2 bg-white border border-[#d3c3be] rounded" />
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full mt-4 bg-[#090100] hover:bg-[#825425] text-white py-3 rounded text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
-                >
-                  Complete Order (₹{subtotal.toLocaleString('en-IN')})
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

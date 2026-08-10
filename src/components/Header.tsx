@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { ActiveTab } from '../types';
+import { Link, useLocation } from 'react-router-dom';
 import { LOGO_IMAGE } from '../data/products';
 import { ShoppingBag, Search, Sparkles, Menu, X, MapPin } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
 
 interface HeaderProps {
-  activeTab: ActiveTab;
-  setActiveTab: (tab: ActiveTab) => void;
   cartCount: number;
   setIsCartOpen: (open: boolean) => void;
   setIsSearchOpen: (open: boolean) => void;
@@ -13,24 +12,23 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  activeTab,
-  setActiveTab,
   cartCount,
   setIsCartOpen,
   setIsSearchOpen,
   setIsBespokeOpen,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const { user } = useAuthStore();
 
-  const navItems: { id: ActiveTab; label: string }[] = [
-    { id: 'home', label: 'Home' },
-    { id: 'shop', label: 'Shop Collection' },
-    { id: 'about', label: 'About Us' },
-    { id: 'contact', label: 'Contact Desk' },
+  const navItems = [
+    { path: '/', label: 'Home' },
+    { path: '/shop', label: 'Shop Collection' },
+    { path: '/about', label: 'About Us' },
+    { path: '/contact', label: 'Contact Desk' },
   ];
 
-  const handleNavClick = (tabId: ActiveTab) => {
-    setActiveTab(tabId);
+  const handleNavClick = () => {
     setIsMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -45,12 +43,13 @@ export const Header: React.FC<HeaderProps> = ({
             COMPLIMENTARY WORLDWIDE EXPRESS SHIPPING
           </span>
           <span className="hidden sm:inline text-[#504440]">•</span>
-          <button
-            onClick={() => { setActiveTab('shop'); window.scrollTo(0, 0); }}
+          <Link
+            to="/shop"
+            onClick={() => window.scrollTo(0, 0)}
             className="hover:text-[#fdc087] transition-colors flex items-center gap-1.5 cursor-pointer font-medium tracking-wide uppercase text-slate-200"
           >
             <span>Complimentary Custom Monogramming & Engraving</span>
-          </button>
+          </Link>
           <span className="hidden md:inline text-[#504440]">•</span>
           <span className="hidden md:inline text-[#fdc087] font-semibold tracking-widest uppercase">
             HANDCRAFTED IN TUSCANY & PARIS
@@ -72,8 +71,9 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Brand Logo */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => handleNavClick('home')}
+          <Link
+            to="/"
+            onClick={() => handleNavClick()}
             className="flex items-center gap-3 group text-left cursor-pointer"
           >
             <img
@@ -90,17 +90,18 @@ export const Header: React.FC<HeaderProps> = ({
                 HERITAGE • PARIS
               </span>
             </div>
-          </button>
+          </Link>
         </div>
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => {
-            const isActive = activeTab === item.id;
+            const isActive = location.pathname === item.path;
             return (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => handleNavClick()}
                 className={`relative py-2 text-sm font-medium transition-colors cursor-pointer ${
                   isActive
                     ? 'text-[#090100] font-semibold'
@@ -111,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {isActive && (
                   <span className="absolute bottom-0 left-0 w-full h-[2px] bg-[#825425] transition-all" />
                 )}
-              </button>
+              </Link>
             );
           })}
         </nav>
@@ -138,6 +139,14 @@ export const Header: React.FC<HeaderProps> = ({
             <Search className="w-5 h-5" />
           </button>
 
+          {/* Account/Login Link */}
+          <Link
+            to={user ? (user.role === 'admin' ? '/admin' : '/account') : '/login'}
+            className="p-2 text-[#1b1c19] hover:text-[#825425] transition-colors rounded-full hover:bg-[#f0eee9] cursor-pointer hidden sm:flex text-sm font-medium items-center gap-1"
+          >
+            {user ? user.name.split(' ')[0] : 'Sign In'}
+          </Link>
+
           {/* Cart Bag Drawer Trigger */}
           <button
             onClick={() => setIsCartOpen(true)}
@@ -160,17 +169,26 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="md:hidden bg-[#fbf9f4] border-b border-[#d3c3be]/40 px-6 py-6 space-y-4 animate-in slide-in-from-top duration-200">
           <div className="flex flex-col space-y-3">
             {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => handleNavClick()}
                 className={`text-left text-base font-medium py-2 border-b border-[#e4e2dd]/60 flex items-center justify-between ${
-                  activeTab === item.id ? 'text-[#825425] font-semibold' : 'text-[#1b1c19]'
+                  location.pathname === item.path ? 'text-[#825425] font-semibold' : 'text-[#1b1c19]'
                 }`}
               >
                 <span>{item.label}</span>
-                {activeTab === item.id && <span className="w-2 h-2 rounded-full bg-[#825425]" />}
-              </button>
+                {location.pathname === item.path && <span className="w-2 h-2 rounded-full bg-[#825425]" />}
+              </Link>
             ))}
+            
+            <Link
+              to={user ? (user.role === 'admin' ? '/admin' : '/account') : '/login'}
+              onClick={() => handleNavClick()}
+              className="text-left text-base font-medium py-2 border-b border-[#e4e2dd]/60 flex items-center justify-between text-[#1b1c19]"
+            >
+              <span>{user ? 'My Account' : 'Sign In'}</span>
+            </Link>
           </div>
 
           <div className="pt-2 flex flex-col gap-3">
