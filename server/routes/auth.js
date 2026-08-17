@@ -71,6 +71,28 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// @route POST /api/auth/admin-login
+router.post('/admin-login', async (req, res) => {
+  try {
+    const { password } = req.body;
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+    if (password === adminPassword) {
+      res.json({
+        _id: 'admin_id_001',
+        name: 'Admin',
+        email: 'admin@alsumora.com',
+        role: 'admin',
+        token: generateToken('admin_id_001'),
+      });
+    } else {
+      res.status(401).json({ message: 'Invalid admin passphrase' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // @route GET /api/auth/profile
 router.get('/profile', protect, async (req, res) => {
   const user = await User.findById(req.user._id);

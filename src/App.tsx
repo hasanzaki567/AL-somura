@@ -16,6 +16,7 @@ import { AuthView } from './components/AuthView';
 import { CheckoutView } from './components/CheckoutView';
 import { AccountView } from './components/AccountView';
 import { AdminView } from './components/AdminView';
+import { AdminLoginView } from './components/AdminLoginView';
 import { useCartStore } from './store/cartStore';
 
 export default function App() {
@@ -82,6 +83,7 @@ export default function App() {
           <Route path="/checkout" element={<CheckoutView />} />
           <Route path="/account" element={<AccountView />} />
           <Route path="/admin" element={<AdminView />} />
+          <Route path="/admin-login" element={<AdminLoginView />} />
         </Routes>
       </main>
 

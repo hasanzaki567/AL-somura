@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Users, Package, LayoutDashboard, Settings, LogOut, ArrowRight } from 'lucide-react';
 
+import { AdminProductsTab } from './AdminProductsTab';
+
 export const AdminView: React.FC = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ export const AdminView: React.FC = () => {
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
-      navigate('/login');
+      navigate('/admin-login');
       return;
     }
     
@@ -196,11 +198,7 @@ export const AdminView: React.FC = () => {
             )}
 
             {activeTab === 'products' && (
-              <div className="bg-white p-12 text-center rounded-xl border border-[#d3c3be]/40">
-                <Settings className="w-12 h-12 text-[#d3c3be] mx-auto mb-4" />
-                <h3 className="font-display text-xl font-bold mb-2">Product Management</h3>
-                <p className="text-sm text-[#827470] mb-6">Database product management is connected but UI is pending full implementation in this step.</p>
-              </div>
+              <AdminProductsTab />
             )}
 
             {activeTab === 'customers' && (

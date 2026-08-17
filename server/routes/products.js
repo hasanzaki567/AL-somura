@@ -1,6 +1,12 @@
 import express from 'express';
 import Product from '../models/Product.js';
 import { protect, admin } from '../middleware/auth.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
@@ -42,6 +48,30 @@ router.get('/:id', async (req, res) => {
 });
 
 // --- ADMIN ROUTES ---
+
+// @route POST /api/products/upload
+// @desc Upload base64 image
+router.post('/upload', protect, admin, (req, res) => {
+  try {
+    const { image } = req.body;
+    if (!image) return res.status(400).json({ message: 'No image provided' });
+
+    const matches = image.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      return res.status(400).json({ message: 'Invalid base64 format' });
+    }
+
+    let extension = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+    const data = Buffer.from(matches[2], 'base64');
+    const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}.${extension}`;
+    const filepath = path.join(__dirname, '../uploads', filename);
+
+    fs.writeFileSync(filepath, data);
+    res.json({ url: `http://localhost:5000/uploads/${filename}` });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
 
 // @route POST /api/products
 // @desc Create a product

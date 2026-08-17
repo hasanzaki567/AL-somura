@@ -217,7 +217,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) =>
             </button>
             <span className="text-[#504440]">|</span>
             <Link
-              to="/admin"
+              to="/admin-login"
               onClick={() => window.scrollTo(0,0)}
               className="text-[#504440] hover:text-[#d3c3be] transition-colors cursor-pointer"
             >
