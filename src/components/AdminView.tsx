@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Users, Package, LayoutDashboard, Settings, LogOut, ArrowRight } from 'lucide-react';
+import { API_URL } from '../config';
 
 import { AdminProductsTab } from './AdminProductsTab';
 
 export const AdminView: React.FC = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'dashboard';
+
+  const setActiveTab = (tabId: string) => {
+    setSearchParams({ tab: tabId });
+  };
+
   const [orders, setOrders] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [customersLoading, setCustomersLoading] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
@@ -22,9 +31,15 @@ export const AdminView: React.FC = () => {
     fetchOrders();
   }, [user, navigate]);
 
+  useEffect(() => {
+    if (activeTab === 'customers') {
+      fetchCustomers();
+    }
+  }, [activeTab]);
+
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch(`${API_URL}/api/orders`, {
         headers: { 'Authorization': `Bearer ${user?.token}` }
       });
       if (res.ok) {
@@ -38,9 +53,26 @@ export const AdminView: React.FC = () => {
     }
   };
 
+  const fetchCustomers = async () => {
+    setCustomersLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/auth/users`, {
+        headers: { 'Authorization': `Bearer ${user?.token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCustomers(data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCustomersLoading(false);
+    }
+  };
+
   const handleUpdateOrderStatus = async (orderId: string, status: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -202,10 +234,61 @@ export const AdminView: React.FC = () => {
             )}
 
             {activeTab === 'customers' && (
-              <div className="bg-white p-12 text-center rounded-xl border border-[#d3c3be]/40">
-                <Users className="w-12 h-12 text-[#d3c3be] mx-auto mb-4" />
-                <h3 className="font-display text-xl font-bold mb-2">Customer Management</h3>
-                <p className="text-sm text-[#827470] mb-6">View registered customers and their LTV.</p>
+              <div className="bg-white rounded-xl shadow-sm border border-[#d3c3be]/40 overflow-hidden">
+                <div className="p-6 border-b border-[#d3c3be]/40 flex justify-between items-center">
+                  <div>
+                    <h3 className="font-display text-lg font-bold">Registered Customers</h3>
+                    <p className="text-xs text-[#827470]">Manage your customer base and view their life time value (LTV).</p>
+                  </div>
+                  <span className="bg-[#825425]/10 text-[#825425] text-xs font-semibold px-2.5 py-1 rounded-full">
+                    {customers.length} Customers
+                  </span>
+                </div>
+                {customersLoading ? (
+                  <div className="p-12 text-center text-[#827470]">Loading customer registry...</div>
+                ) : customers.length === 0 ? (
+                  <div className="p-12 text-center text-[#827470]">
+                    <Users className="w-12 h-12 text-[#d3c3be] mx-auto mb-4" />
+                    <p className="font-medium text-[#1b1c19]">No customers registered yet.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-[#f0eee9] text-[#504440] uppercase tracking-wider text-[10px]">
+                        <tr>
+                          <th className="px-6 py-4 font-semibold">Customer Name</th>
+                          <th className="px-6 py-4 font-semibold">Email</th>
+                          <th className="px-6 py-4 font-semibold">Phone</th>
+                          <th className="px-6 py-4 font-semibold">Joined Date</th>
+                          <th className="px-6 py-4 font-semibold text-center">Orders</th>
+                          <th className="px-6 py-4 font-semibold text-right">LTV</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#d3c3be]/40">
+                        {customers.map(cust => {
+                          const customerOrders = orders.filter(o => o.customerInfo?.email === cust.email);
+                          const orderCount = customerOrders.length;
+                          const ltv = customerOrders.reduce((sum, o) => sum + o.total, 0);
+
+                          return (
+                            <tr key={cust._id} className="hover:bg-[#fbf9f4]">
+                              <td className="px-6 py-4 font-medium text-[#1b1c19]">{cust.name}</td>
+                              <td className="px-6 py-4 text-[#827470]">{cust.email}</td>
+                              <td className="px-6 py-4 text-[#827470]">{cust.phone || 'N/A'}</td>
+                              <td className="px-6 py-4 text-[#827470]">
+                                {cust.createdAt ? new Date(cust.createdAt).toLocaleDateString() : 'N/A'}
+                              </td>
+                              <td className="px-6 py-4 text-center font-medium">{orderCount}</td>
+                              <td className="px-6 py-4 text-right font-semibold text-emerald-700">
+                                ₹{ltv.toLocaleString()}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
           </>

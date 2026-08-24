@@ -8,7 +8,15 @@ export const protect = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_please_change');
-      req.user = await User.findById(decoded.id).select('-password');
+      
+      const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(decoded.id);
+      if (isValidObjectId) {
+        req.user = await User.findById(decoded.id).select('-password');
+      } else {
+        // Fallback for legacy admin tokens (e.g. 'admin_id_001')
+        req.user = await User.findOne({ role: 'admin' }).select('-password');
+      }
+      
       next();
     } catch (error) {
       res.status(401).json({ message: 'Not authorized, token failed' });

@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-[#fbf9f4]/90 backdrop-blur-md border-b border-[#d3c3be]/30 transition-all duration-300">
       {/* Stable Static Top Banner */}
-      <div className="bg-[#090100] text-[#ffffff] text-[11px] sm:text-xs font-body tracking-wider py-2 px-4 border-b border-[#2c1810]">
+      <div className="hidden sm:block bg-[#090100] text-[#ffffff] text-[11px] sm:text-xs font-body tracking-wider py-2 px-4 border-b border-[#2c1810]">
         <div className="max-w-7xl mx-auto flex items-center justify-center text-center gap-3 sm:gap-6 flex-wrap">
           <span className="text-[#fdc087] font-semibold tracking-widest uppercase flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-[#fdc087]" />
@@ -60,36 +60,36 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-20 flex items-center justify-between">
         {/* Mobile Menu Button */}
         <div className="flex items-center md:hidden">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-[#1b1c19] hover:text-[#825425] transition-colors"
+            className="p-1.5 text-[#1b1c19] hover:text-[#825425] transition-colors"
             aria-label="Toggle Navigation Menu"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
         {/* Brand Logo */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Link
             to="/"
             onClick={() => handleNavClick()}
-            className="flex items-center gap-3 group text-left cursor-pointer"
+            className="flex items-center gap-2 sm:gap-3 group text-left cursor-pointer"
           >
             <img
               src={LOGO_IMAGE}
               alt="Al Sumora Heritage Logo"
               referrerPolicy="no-referrer"
-              className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-8 sm:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
             <div className="flex flex-col">
-              <span className="font-display font-bold text-xl sm:text-2xl tracking-wider text-[#090100] uppercase">
+              <span className="font-display font-bold text-sm sm:text-2xl tracking-wider text-[#090100] uppercase leading-none">
                 AL SUMORA
               </span>
-              <span className="text-[10px] tracking-[0.25em] text-[#825425] uppercase font-semibold -mt-1">
+              <span className="text-[7px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.25em] text-[#825425] uppercase font-semibold mt-0.5 leading-none">
                 HERITAGE • PARIS
               </span>
             </div>
@@ -121,7 +121,7 @@ export const Header: React.FC<HeaderProps> = ({
         </nav>
 
         {/* Right Actions Header */}
-        <div className="flex items-center space-x-3 sm:space-x-5">
+        <div className="flex items-center space-x-1.5 sm:space-x-5">
           {/* Track Order Shortcut */}
           <Link
             to="/track"
@@ -135,23 +135,23 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Search Trigger */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="p-2 text-[#1b1c19] hover:text-[#825425] transition-colors rounded-full hover:bg-[#f0eee9] cursor-pointer"
+            className="p-1.5 text-[#1b1c19] hover:text-[#825425] transition-colors rounded-full hover:bg-[#f0eee9] cursor-pointer"
             title="Search Collection"
             aria-label="Search Collection"
           >
-            <Search className="w-5 h-5" />
+            <Search className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           {/* Wishlist Link */}
           <Link
             to="/wishlist"
-            className="p-2 text-[#1b1c19] hover:text-[#825425] transition-colors relative rounded-full hover:bg-[#f0eee9] cursor-pointer"
+            className="p-1.5 text-[#1b1c19] hover:text-[#825425] transition-colors relative rounded-full hover:bg-[#f0eee9] cursor-pointer"
             title="Saved Wishlist"
             aria-label="Saved Wishlist"
           >
-            <Heart className={`w-5 h-5 ${wishlistCount > 0 ? 'fill-[#825425] text-[#825425]' : ''}`} />
+            <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${wishlistCount > 0 ? 'fill-[#825425] text-[#825425]' : ''}`} />
             {wishlistCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#825425] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute top-0 right-0 bg-[#825425] text-white text-[8px] sm:text-[10px] font-bold w-3 h-3 sm:w-4 sm:h-4 rounded-full flex items-center justify-center">
                 {wishlistCount}
               </span>
             )}
@@ -160,13 +160,13 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Cart Bag Link */}
           <Link
             to="/cart"
-            className="p-2 text-[#1b1c19] hover:text-[#825425] transition-colors relative rounded-full hover:bg-[#f0eee9] cursor-pointer"
+            className="p-1.5 text-[#1b1c19] hover:text-[#825425] transition-colors relative rounded-full hover:bg-[#f0eee9] cursor-pointer"
             title="View Shopping Bag"
             aria-label="View Shopping Bag"
           >
-            <ShoppingBag className="w-5 h-5" />
+            <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#825425] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute top-0 right-0 bg-[#825425] text-white text-[8px] sm:text-[10px] font-bold w-3 h-3 sm:w-4 sm:h-4 rounded-full flex items-center justify-center">
                 {cartCount}
               </span>
             )}
@@ -175,11 +175,11 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Account/Profile Link */}
           <Link
             to={user ? (user.role === 'admin' ? '/admin' : '/account') : '/login'}
-            className="p-2 text-[#1b1c19] hover:text-[#825425] transition-colors rounded-full hover:bg-[#f0eee9] cursor-pointer flex text-sm font-medium items-center gap-1.5"
+            className="p-1.5 text-[#1b1c19] hover:text-[#825425] transition-colors rounded-full hover:bg-[#f0eee9] cursor-pointer flex text-sm font-medium items-center gap-1.5"
             title={user ? `Account (${user.name})` : "Sign In"}
             aria-label={user ? `Account (${user.name})` : "Sign In"}
           >
-            <User className="w-5 h-5" />
+            <User className="w-4 h-4 sm:w-5 sm:h-5" />
             {user && (
               <span className="hidden sm:inline text-xs font-semibold tracking-wide">
                 {user.name.split(' ')[0]}

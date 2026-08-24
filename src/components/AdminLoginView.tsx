@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Shield, ArrowRight } from 'lucide-react';
+import { API_URL } from '../config';
 
 export const AdminLoginView: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -20,7 +21,7 @@ export const AdminLoginView: React.FC = () => {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/admin-login', {
+      const res = await fetch(`${API_URL}/api/auth/admin-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })

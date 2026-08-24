@@ -109,4 +109,21 @@
   animation-play-state: paused;
 }
 
-
+/* Thin scrollbar for product grid */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(130, 84, 37, 0.25);
+  border-radius: 999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(130, 84, 37, 0.5);
+}
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(130, 84, 37, 0.25) transparent;
+}

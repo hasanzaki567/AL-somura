@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Package, User as UserIcon, LogOut, Truck } from 'lucide-react';
+import { API_URL } from '../config';
 
 export const AccountView: React.FC = () => {
   const { user, logout } = useAuthStore();
@@ -17,7 +18,7 @@ export const AccountView: React.FC = () => {
 
     const fetchOrders = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/orders/myorders', {
+        const res = await fetch(`${API_URL}/api/orders/myorders`, {
           headers: {
             'Authorization': `Bearer ${user.token}`
           }

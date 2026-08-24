@@ -36,7 +36,15 @@ router.get('/', async (req, res) => {
 // @desc Fetch single product
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    let product;
+    const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(req.params.id);
+    if (isValidObjectId) {
+      product = await Product.findById(req.params.id);
+    }
+    if (!product) {
+      product = await Product.findOne({ slug: req.params.id });
+    }
+
     if (product) {
       res.json(product);
     } else {
@@ -89,7 +97,15 @@ router.post('/', protect, admin, async (req, res) => {
 // @desc Update a product
 router.put('/:id', protect, admin, async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    let product;
+    const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(req.params.id);
+    if (isValidObjectId) {
+      product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    }
+    if (!product) {
+      product = await Product.findOneAndUpdate({ slug: req.params.id }, req.body, { new: true });
+    }
+
     if (product) {
       res.json(product);
     } else {
@@ -104,7 +120,15 @@ router.put('/:id', protect, admin, async (req, res) => {
 // @desc Soft delete (archive) a product
 router.delete('/:id', protect, admin, async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    let product;
+    const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(req.params.id);
+    if (isValidObjectId) {
+      product = await Product.findById(req.params.id);
+    }
+    if (!product) {
+      product = await Product.findOne({ slug: req.params.id });
+    }
+
     if (product) {
       product.status = 'archived';
       await product.save();

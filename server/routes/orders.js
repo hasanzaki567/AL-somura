@@ -20,7 +20,15 @@ router.post('/', protect, async (req, res) => {
 
     // Verify stock and calculate prices from DB
     for (const item of items) {
-      const product = await Product.findById(item.productId);
+      let product;
+      const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(item.productId);
+      if (isValidObjectId) {
+        product = await Product.findById(item.productId);
+      }
+      if (!product) {
+        product = await Product.findOne({ slug: item.productId });
+      }
+
       if (!product) {
         return res.status(404).json({ message: `Product ${item.productId} not found` });
       }

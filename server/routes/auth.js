@@ -78,12 +78,26 @@ router.post('/admin-login', async (req, res) => {
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
 
     if (password === adminPassword) {
+      // Find or create the admin user in the database
+      let adminUser = await User.findOne({ email: 'admin@alsumora.com' });
+      if (!adminUser) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(adminPassword, salt);
+        adminUser = await User.create({
+          name: 'Admin',
+          email: 'admin@alsumora.com',
+          password: hashedPassword,
+          role: 'admin',
+          phone: '1234567890'
+        });
+      }
+
       res.json({
-        _id: 'admin_id_001',
-        name: 'Admin',
-        email: 'admin@alsumora.com',
-        role: 'admin',
-        token: generateToken('admin_id_001'),
+        _id: adminUser._id,
+        name: adminUser.name,
+        email: adminUser.email,
+        role: adminUser.role,
+        token: generateToken(adminUser._id),
       });
     } else {
       res.status(401).json({ message: 'Invalid admin passphrase' });
@@ -107,6 +121,20 @@ router.get('/profile', protect, async (req, res) => {
     });
   } else {
     res.status(404).json({ message: 'User not found' });
+  }
+});
+
+// @route GET /api/auth/users
+// @desc Get all registered customers (Admin only)
+router.get('/users', protect, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized as an admin' });
+    }
+    const users = await User.find({ role: 'customer' }).select('-password').sort({ createdAt: -1 });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 

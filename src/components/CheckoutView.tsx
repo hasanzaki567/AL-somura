@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
+import { API_URL } from '../config';
 
 export const CheckoutView: React.FC = () => {
   const { user } = useAuthStore();
@@ -47,7 +48,7 @@ export const CheckoutView: React.FC = () => {
         monogram: item.monogram
       }));
 
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

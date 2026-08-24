@@ -33,8 +33,50 @@ app.use('/api/orders', orderRoutes);
 
 // Database Connection
 mongoose.connect(MONGO_URI)
-  .then(() => console.log('MongoDB connected successfully'))
+  .then(async () => {
+    console.log('MongoDB connected successfully');
+    
+    // Auto-seeding logic for 54 products catalog
+    try {
+      const Product = (await import('./models/Product.js')).default;
+      const count = await Product.countDocuments({ status: { $ne: 'archived' } });
+      if (count < 50) {
+        console.log(`Database has only ${count} products. Auto-seeding the 54 premium products...`);
+        const jsonPath = path.resolve(__dirname, '../src/data/products_data.json');
+        if (fs.existsSync(jsonPath)) {
+          const rawData = fs.readFileSync(jsonPath, 'utf8');
+          const products = JSON.parse(rawData);
+          
+          // Clear active and inactive products (keep archived if any)
+          await Product.deleteMany({ status: { $ne: 'archived' } });
+          
+          // Seed the database
+          const formattedProducts = products.map(p => ({
+            ...p,
+            slug: p.id,
+            stock: p.stock || 15,
+            status: 'active'
+          }));
+          await Product.insertMany(formattedProducts);
+          console.log(`Successfully seeded ${formattedProducts.length} products into the database.`);
+        } else {
+          console.error(`Seed file not found at: ${jsonPath}`);
+        }
+      }
+    } catch (err) {
+      console.error('Error during auto-seeding:', err);
+    }
+  })
   .catch((err) => console.error('MongoDB connection error:', err));
+
+// Serve frontend static assets in production
+if (process.env.NODE_ENV === 'production') {
+  const distDir = path.join(__dirname, '../dist');
+  app.use(express.static(distDir));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distDir, 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

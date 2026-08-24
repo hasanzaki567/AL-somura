@@ -71,11 +71,12 @@ export const WishlistView: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-6">
             {wishlistItems.map((product) => (
               <div
                 key={product.id}
-                className="group bg-white rounded-2xl border border-[#d3c3be]/35 overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+                onClick={() => navigate(`/product/${product.id}`)}
+                className="group bg-white rounded-lg sm:rounded-2xl border border-[#d3c3be]/35 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer"
               >
                 {/* Image Area */}
                 <div className="relative aspect-[4/3] bg-[#f5f3ee] overflow-hidden flex items-center justify-center">
@@ -83,45 +84,48 @@ export const WishlistView: React.FC = () => {
                     src={product.images[0]}
                     alt={product.name}
                     referrerPolicy="no-referrer"
-                    onClick={() => navigate(`/product/${product.id}`)}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <span className="absolute top-3 left-3 bg-[#090100]/90 text-white text-[9px] font-semibold px-2.5 py-1 rounded tracking-wider uppercase">
+                  <span className="absolute top-2 left-2 bg-[#090100]/90 text-white text-[8px] sm:text-[9px] font-semibold px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded tracking-wider uppercase">
                     {product.category}
                   </span>
                   <button
-                    onClick={() => removeItem(product.id)}
-                    className="absolute top-3 right-3 p-2 bg-white/95 text-[#827470] hover:text-red-600 rounded-full shadow-xs hover:shadow-md transition-all cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeItem(product.id);
+                    }}
+                    className="absolute top-2 right-2 p-1.5 bg-white/95 text-[#827470] hover:text-red-600 rounded-full shadow-xs hover:shadow-md transition-all cursor-pointer"
                     title="Remove from wishlist"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
                 {/* Content Info */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div className="space-y-1">
-                    <h3
-                      onClick={() => navigate(`/product/${product.id}`)}
-                      className="font-display font-semibold text-[#090100] hover:text-[#825425] transition-colors cursor-pointer text-base line-clamp-1"
-                    >
+                <div className="p-2.5 sm:p-5 flex-1 flex flex-col justify-between space-y-1.5">
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <h3 className="font-display font-medium text-[#090100] hover:text-[#825425] transition-colors text-xs sm:text-base line-clamp-1 sm:line-clamp-2">
                       {product.name}
                     </h3>
-                    <p className="text-xs text-[#827470] line-clamp-2 leading-relaxed">
+                    <p className="text-[10px] sm:text-xs text-[#827470] line-clamp-2 leading-relaxed hidden sm:block">
                       {product.description}
                     </p>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-[#f0eee9] flex items-center justify-between">
-                    <span className="text-base font-bold text-[#825425]">
+                  <div className="pt-2 border-t border-[#f0eee9] flex items-center justify-between gap-1">
+                    <span className="text-xs sm:text-base font-bold text-[#825425]">
                       ₹{product.price.toLocaleString('en-IN')}
                     </span>
                     <button
-                      onClick={() => handleMoveToCart(product)}
-                      className="px-4 py-2 bg-[#090100] hover:bg-[#825425] text-white rounded text-[10px] font-semibold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMoveToCart(product);
+                      }}
+                      className="p-1.5 sm:px-4 sm:py-2 bg-[#090100] hover:bg-[#825425] text-white rounded text-[10px] font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                      title="Move to Shopping Bag"
                     >
                       <ShoppingBag className="w-3.5 h-3.5 text-[#fdc087]" />
-                      <span>Move to Bag</span>
+                      <span className="hidden sm:inline">Move to Bag</span>
                     </button>
                   </div>
                 </div>

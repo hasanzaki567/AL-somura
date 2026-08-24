@@ -137,6 +137,8 @@ export default function App() {
 // Wrapper to parse the ID from URL and pass to ProductDetailView
 import { useParams } from 'react-router-dom';
 
+import { API_URL } from './config';
+
 function ProductDetailViewWrapper({ onBack, onAddToCart }: any) {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<any>(null);
@@ -145,7 +147,7 @@ function ProductDetailViewWrapper({ onBack, onAddToCart }: any) {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/products/${id}`);
+        const res = await fetch(`${API_URL}/api/products/${id}`);
         if (res.ok) {
           const data = await res.json();
           setProduct({ ...data, id: data._id || data.id });
