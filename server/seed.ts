@@ -48,6 +48,8 @@ const seedDatabase = async () => {
       details: p.details,
       boutiques: p.boutiques,
       isFeatured: p.isFeatured || false,
+      isBestSeller: p.isBestSeller !== undefined ? p.isBestSeller : (p.isFeatured || false),
+      isLowStock: p.isLowStock !== undefined ? p.isLowStock : false,
       customizable: p.customizable || false,
       status: 'active'
     }));

@@ -17,6 +17,8 @@ export interface Product {
   colors: ProductColor[];
   boutiques: string[]; // e.g. ['paris', 'milan', 'london']
   isFeatured?: boolean;
+  isBestSeller?: boolean;
+  isLowStock?: boolean;
   customizable?: boolean;
 }
 

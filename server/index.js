@@ -55,6 +55,8 @@ mongoose.connect(MONGO_URI)
             ...p,
             slug: p.id,
             stock: p.stock || 15,
+            isBestSeller: p.isBestSeller !== undefined ? p.isBestSeller : (p.isFeatured || false),
+            isLowStock: p.isLowStock !== undefined ? p.isLowStock : false,
             status: 'active'
           }));
           await Product.insertMany(formattedProducts);
@@ -62,6 +64,17 @@ mongoose.connect(MONGO_URI)
         } else {
           console.error(`Seed file not found at: ${jsonPath}`);
         }
+      }
+      
+      // Manually force-update badges on key products to ensure they appear in the database
+      try {
+        const Product = (await import('./models/Product.js')).default;
+        await Product.updateOne({ slug: 'sovereign-cafe-racer' }, { isBestSeller: true, isLowStock: true });
+        await Product.updateOne({ slug: 'atelier-suede-bomber' }, { isBestSeller: true, isLowStock: false });
+        await Product.updateOne({ slug: 'handwelted-oxford-shoes' }, { isBestSeller: true, isLowStock: true });
+        console.log('Successfully updated showcase badges for key seed products in MongoDB.');
+      } catch (err) {
+        console.error('Error updating key badges on startup:', err);
       }
     } catch (err) {
       console.error('Error during auto-seeding:', err);

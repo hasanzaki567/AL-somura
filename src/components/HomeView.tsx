@@ -5,6 +5,7 @@ import { PRODUCTS, HERO_SLIDES } from '../data/products';
 import { REVIEWS } from '../data/reviews';
 import { ArrowRight, Sparkles, ShieldCheck, Award, Star, Eye, ShoppingBag, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import { useWishlistStore } from '../store/wishlistStore';
+import { API_URL } from '../config';
 
 interface HomeViewProps {
   onSelectProduct: (product: Product) => void;
@@ -17,9 +18,28 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onQuickAddToCart,
 }) => {
   const navigate = useNavigate();
-  const featuredProducts = PRODUCTS.slice(0, 8); // Showcase products across jackets, shoes, briefcases, wallets, bags
+  const [products, setProducts] = useState<any[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const { toggleWishlist, isInWishlist } = useWishlistStore();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/products?t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data);
+        } else {
+          setProducts(PRODUCTS);
+        }
+      } catch (error) {
+        setProducts(PRODUCTS);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const featuredProducts = products.length > 0 ? products.slice(0, 8) : PRODUCTS.slice(0, 8);
 
   // Auto slide interval
   useEffect(() => {
@@ -192,7 +212,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {featuredProducts.map((product, idx) => {
-            const isBestSeller = product.isFeatured && idx < 4;
             const reviewCount = 42 + ((product.price % 31) + idx * 9) % 55;
             const reviewScore = 4.5 + (idx % 3) * 0.15;
             return (
@@ -210,11 +229,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
-                  {isBestSeller && (
-                    <span className="absolute top-2.5 left-2.5 bg-[#825425] text-white text-[8px] sm:text-[10px] font-bold px-2 py-0.5 rounded tracking-widest uppercase shadow-md">
-                      ★ Best Seller
-                    </span>
-                  )}
+                  
+                  {/* Top-left — badges */}
+                  <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
+                    {product.isBestSeller && (
+                      <span className="bg-[#825425] text-white text-[8px] sm:text-[10px] font-bold px-2 py-0.5 rounded tracking-widest uppercase shadow-md">
+                        ★ Best Seller
+                      </span>
+                    )}
+                    {product.isLowStock && (
+                      <span className="bg-red-600/90 text-white text-[8px] sm:text-[10px] font-semibold px-2 py-0.5 rounded tracking-wide uppercase shadow-md animate-pulse">
+                        Only 3 Left
+                      </span>
+                    )}
+                  </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); toggleWishlist(product); }}
                     className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all cursor-pointer ${

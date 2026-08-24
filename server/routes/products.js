@@ -97,6 +97,7 @@ router.post('/', protect, admin, async (req, res) => {
 // @desc Update a product
 router.put('/:id', protect, admin, async (req, res) => {
   try {
+    console.log('PUT payload received:', req.body);
     let product;
     const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(req.params.id);
     if (isValidObjectId) {

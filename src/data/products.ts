@@ -56,6 +56,8 @@ export const PRODUCTS: Product[] = [
     price: 154999,
     category: 'Jackets',
     isFeatured: true,
+    isBestSeller: true,
+    isLowStock: true,
     customizable: true,
     description: 'Precision-tailored in full-grain Italian Nappa leather. Features heavy-gauge antiqued brass zippers, silk-satin diamond quilted lining, and an ergonomic band collar.',
     details: [
@@ -82,6 +84,8 @@ export const PRODUCTS: Product[] = [
     price: 138000,
     category: 'Jackets',
     isFeatured: true,
+    isBestSeller: true,
+    isLowStock: false,
     customizable: false,
     description: 'Crafted from velvety Spanish goat suede with hand-knit ribbed waist and collar. Designed for effortlessly elevated casual outerwear.',
     details: [

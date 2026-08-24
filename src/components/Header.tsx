@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LOGO_IMAGE } from '../data/products';
 import { ShoppingBag, Search, Sparkles, Menu, X, MapPin, Heart, User, Truck } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useWishlistStore } from '../store/wishlistStore';
+import { API_URL } from '../config';
 
 interface HeaderProps {
   cartCount: number;
@@ -23,6 +24,33 @@ export const Header: React.FC<HeaderProps> = ({
   const { user } = useAuthStore();
   const { wishlistItems, setIsWishlistOpen } = useWishlistStore();
   const wishlistCount = wishlistItems.length;
+  const [hasOrders, setHasOrders] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setHasOrders(false);
+      return;
+    }
+
+    const checkOrders = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/orders/myorders?t=${Date.now()}`, {
+          headers: {
+            'Authorization': `Bearer ${user.token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setHasOrders(data && data.length > 0);
+        }
+      } catch (err) {
+        console.error('Failed to check user orders', err);
+        setHasOrders(false);
+      }
+    };
+
+    checkOrders();
+  }, [user]);
 
   const navItems = [
     { path: '/', label: 'Home' },
@@ -123,14 +151,16 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Right Actions Header */}
         <div className="flex items-center space-x-1.5 sm:space-x-5">
           {/* Track Order Shortcut */}
-          <Link
-            to="/track"
-            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#825425]/40 text-[#825425] hover:bg-[#825425] hover:text-white transition-all text-xs font-semibold tracking-wider uppercase cursor-pointer"
-            title="Track Your Order"
-          >
-            <Truck className="w-3.5 h-3.5" />
-            <span>Track Order</span>
-          </Link>
+          {user && hasOrders && (
+            <Link
+              to="/track"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#825425]/40 text-[#825425] hover:bg-[#825425] hover:text-white transition-all text-xs font-semibold tracking-wider uppercase cursor-pointer"
+              title="Track Your Order"
+            >
+              <Truck className="w-3.5 h-3.5" />
+              <span>Track Order</span>
+            </Link>
+          )}
 
           {/* Search Trigger */}
           <button

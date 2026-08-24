@@ -22,6 +22,8 @@ const productSchema = new mongoose.Schema({
   details: [{ type: String }], // additional features list
   boutiques: [{ type: String }],
   isFeatured: { type: Boolean, default: false },
+  isBestSeller: { type: Boolean, default: false },
+  isLowStock: { type: Boolean, default: false },
   customizable: { type: Boolean, default: false }
 }, { timestamps: true });
 

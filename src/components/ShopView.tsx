@@ -47,7 +47,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
         if (search) queryParams.append('search', search);
 
         // Fetch from new backend API
-        const res = await fetch(`${API_URL}/api/products?${queryParams}`);
+        const res = await fetch(`${API_URL}/api/products?${queryParams}&t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
           // Transform _id to id if necessary, but we'll map it inline
@@ -83,16 +83,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
     });
 
   return (
-    <div className="bg-[#fbf9f4] min-h-screen">
-      {/* Header Banner */}
-      <div className="bg-[#090100] text-white py-8 sm:py-16 px-4">
-        <div className="max-w-7xl mx-auto text-center space-y-2 sm:space-y-4">
-          <h1 className="font-display font-bold text-2xl sm:text-4xl tracking-tight">The Complete Collection</h1>
-          <p className="text-[#d3c3be] text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
-            Discover our entire range of handcrafted Tuscan leather goods. Each piece is saddle-stitched by master artisans and built to last generations.
-          </p>
-        </div>
-      </div>
+    <div className="bg-[#fbf9f4] min-h-screen pt-4 sm:pt-6">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8 pb-8">
         <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:items-start">
@@ -159,10 +150,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
           </div>
 
           {/* Product Grid — scrolls independently on desktop */}
-          <div className="flex-1 w-full lg:max-h-[calc(100vh-160px)] lg:overflow-y-auto lg:pr-1 scrollbar-thin">
-            <div className="mb-4 sm:mb-6 flex justify-between items-center text-xs sm:text-sm text-[#504440]">
-              <span>Showing <strong>{filteredAndSortedProducts.length}</strong> items {activeCategory !== 'All' ? `in ${activeCategory}` : ''}</span>
-            </div>
+          <div className="flex-1 w-full lg:max-h-[calc(100vh-160px)] lg:overflow-y-auto lg:pr-1 scrollbar-thin mt-2">
 
             {loading ? (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
@@ -187,9 +175,8 @@ export const ShopView: React.FC<ShopViewProps> = ({
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {filteredAndSortedProducts.map((product, idx) => {
-                  // Psychological signals — deterministic so they don't flicker
-                  const isBestSeller = product.isFeatured && idx < 8;
-                  const isLowStock = (product.price % 5 === 0) && idx % 4 === 2;
+                  const isBestSeller = product.isBestSeller;
+                  const isLowStock = product.isLowStock;
                   const reviewCount = 40 + ((product.price % 37) + idx * 7) % 60;
                   const reviewScore = 4 + (idx % 3) * 0.2 + 0.5; // 4.5–4.9
 
@@ -255,28 +242,9 @@ export const ShopView: React.FC<ShopViewProps> = ({
                         </span>
 
                         {/* Name */}
-                        <h3 className="font-display font-semibold text-[10px] sm:text-xs md:text-[13px] text-[#090100] leading-snug line-clamp-2 group-hover:text-[#825425] transition-colors">
+                        <h3 className="font-display font-semibold text-xs sm:text-sm md:text-[15px] text-[#090100] leading-snug line-clamp-2 group-hover:text-[#825425] transition-colors">
                           {product.name}
                         </h3>
-
-                        {/* Stars + review count */}
-                        <div className="flex items-center gap-1">
-                          <div className="flex gap-px">
-                            {[1,2,3,4,5].map(s => (
-                              <svg key={s} className={`w-2 h-2 sm:w-2.5 sm:h-2.5 ${s <= Math.round(reviewScore) ? 'text-[#f59e0b]' : 'text-[#ddd]'}`} fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                              </svg>
-                            ))}
-                          </div>
-                          <span className="text-[8px] sm:text-[9px] text-[#827470]">({reviewCount})</span>
-                        </div>
-
-                        {/* Trust Badges */}
-                        <div className="flex items-center gap-1 text-[7px] sm:text-[9px] text-emerald-700 font-medium">
-                          <span>✓ Lifetime Warranty</span>
-                          <span className="text-[#d3c3be]">•</span>
-                          <span>Free Delivery</span>
-                        </div>
 
                         {/* Price + CTA at bottom */}
                         <div className="mt-auto pt-2 border-t border-[#f0eee9] flex items-center justify-between gap-2">

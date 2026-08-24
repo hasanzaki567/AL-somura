@@ -34,7 +34,9 @@ export const AdminProductsTab: React.FC = () => {
     price: '',
     category: 'Jackets',
     stock: '0',
-    images: [] as string[]
+    images: [] as string[],
+    isBestSeller: false,
+    isLowStock: false
   });
 
   useEffect(() => {
@@ -53,7 +55,9 @@ export const AdminProductsTab: React.FC = () => {
           price: existing.price.toString(),
           category: existing.category,
           stock: existing.stock.toString(),
-          images: existing.images || []
+          images: existing.images || [],
+          isBestSeller: existing.isBestSeller || false,
+          isLowStock: existing.isLowStock || false
         });
         setActiveImageIndex(0);
       } else if (products.length > 0) {
@@ -68,7 +72,9 @@ export const AdminProductsTab: React.FC = () => {
         price: '',
         category: selectedCategory && selectedCategory !== 'All' ? selectedCategory : 'Jackets',
         stock: '15',
-        images: []
+        images: [],
+        isBestSeller: false,
+        isLowStock: false
       });
       setActiveImageIndex(0);
     }
@@ -76,7 +82,7 @@ export const AdminProductsTab: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/products`);
+      const res = await fetch(`${API_URL}/api/products?t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         setProducts(data);
@@ -90,7 +96,7 @@ export const AdminProductsTab: React.FC = () => {
 
   const fetchProductById = async (id: string) => {
     try {
-      const res = await fetch(`${API_URL}/api/products/${id}`);
+      const res = await fetch(`${API_URL}/api/products/${id}?t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         setForm({
@@ -100,7 +106,9 @@ export const AdminProductsTab: React.FC = () => {
           price: data.price.toString(),
           category: data.category,
           stock: data.stock.toString(),
-          images: data.images || []
+          images: data.images || [],
+          isBestSeller: data.isBestSeller || false,
+          isLowStock: data.isLowStock || false
         });
         setActiveImageIndex(0);
       }
@@ -578,6 +586,39 @@ export const AdminProductsTab: React.FC = () => {
                 </div>
               </div>
 
+              {/* Showcase Badges card */}
+              <div className="bg-[#fbf9f4] p-5 rounded-xl border border-[#d3c3be]/40 space-y-4">
+                <h3 className="font-display font-bold text-sm text-[#090100] uppercase tracking-wider">Showcase Badges</h3>
+                
+                <div className="space-y-3">
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <input 
+                      type="checkbox"
+                      checked={form.isBestSeller}
+                      onChange={e => setForm({...form, isBestSeller: e.target.checked})}
+                      className="mt-1 h-4 w-4 rounded border-[#d3c3be] text-[#825425] focus:ring-[#825425] cursor-pointer"
+                    />
+                    <div>
+                      <span className="block text-xs font-semibold text-[#090100] group-hover:text-[#825425] transition-colors">Mark as Best Seller</span>
+                      <span className="block text-[10px] text-[#827470]">Applies a "★ Best Seller" badge on the shop storefront.</span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-3 cursor-pointer group pt-2 border-t border-[#d3c3be]/30">
+                    <input 
+                      type="checkbox"
+                      checked={form.isLowStock}
+                      onChange={e => setForm({...form, isLowStock: e.target.checked})}
+                      className="mt-1 h-4 w-4 rounded border-[#d3c3be] text-[#825425] focus:ring-[#825425] cursor-pointer"
+                    />
+                    <div>
+                      <span className="block text-xs font-semibold text-[#090100] group-hover:text-[#825425] transition-colors">Mark as Low Stock</span>
+                      <span className="block text-[10px] text-[#827470]">Applies an "Only 3 Left" urgency badge to prompt purchases.</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
               {/* Danger zone / archive */}
               {!isNew && (
                 <div className="p-4 border border-red-200 bg-red-50/50 rounded-xl space-y-2">
@@ -681,8 +722,20 @@ export const AdminProductsTab: React.FC = () => {
                         <ImageIcon className="w-5 h-5 text-[#827470]" />
                       )}
                     </div>
-                    <div>
-                      <p className="font-semibold text-[#1b1c19]">{p.name}</p>
+                     <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-[#1b1c19]">{p.name}</p>
+                        {p.isBestSeller && (
+                          <span className="bg-[#825425] text-white text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">
+                            Best Seller
+                          </span>
+                        )}
+                        {p.isLowStock && (
+                          <span className="bg-red-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">
+                            Low Stock
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[#827470] text-xs font-mono">{p._id.slice(-8).toUpperCase()}</p>
                     </div>
                   </td>

@@ -226,6 +226,19 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   )}
                 </div>
 
+                <div className="flex items-center gap-2 mb-2 mt-2">
+                  {product.isBestSeller && (
+                    <span className="bg-[#825425] text-white text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase">
+                      ★ Best Seller
+                    </span>
+                  )}
+                  {product.isLowStock && (
+                    <span className="bg-red-600 text-white text-[9px] font-semibold px-2 py-0.5 rounded tracking-wider uppercase animate-pulse">
+                      Only 3 Left
+                    </span>
+                  )}
+                </div>
+
                 <h2 className="font-display font-bold text-2xl md:text-3xl text-[#090100] leading-tight">
                   {product.name}
                 </h2>
