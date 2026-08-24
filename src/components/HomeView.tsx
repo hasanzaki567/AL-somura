@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product, ProductColor } from '../types';
-import { PRODUCTS, HERO_SLIDES, CUSTOMIZATION_IMAGES } from '../data/products';
+import { PRODUCTS, HERO_SLIDES } from '../data/products';
 import { REVIEWS } from '../data/reviews';
-import { ArrowRight, Sparkles, ShieldCheck, Award, Star, Eye, ShoppingBag, ChevronLeft, ChevronRight, Sliders } from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, Award, Star, Eye, ShoppingBag, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
+import { useWishlistStore } from '../store/wishlistStore';
 
 interface HomeViewProps {
   onSelectProduct: (product: Product) => void;
@@ -18,6 +19,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const navigate = useNavigate();
   const featuredProducts = PRODUCTS.slice(0, 8); // Showcase products across jackets, shoes, briefcases, wallets, bags
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
 
   // Auto slide interval
   useEffect(() => {
@@ -164,6 +166,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   {product.category}
                 </span>
 
+                {/* Wishlist Heart Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleWishlist(product);
+                  }}
+                  className={`absolute top-3 right-3 p-2 rounded-full shadow transition-all cursor-pointer ${
+                    isInWishlist(product.id)
+                      ? 'bg-[#825425] text-white opacity-100'
+                      : 'bg-white/90 text-[#090100] opacity-80 hover:opacity-100 hover:bg-[#825425] hover:text-white'
+                  }`}
+                  title={isInWishlist(product.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                >
+                  <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-white' : ''}`} />
+                </button>
+
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -212,55 +230,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* Customization Feature Overview (No Standalone Bespoke Modal Button) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-[#2c1810] rounded-2xl overflow-hidden shadow-2xl text-white grid grid-cols-1 lg:grid-cols-2 border border-[#825425]/40">
-          <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center space-y-6">
-            <div className="inline-flex items-center gap-2 text-[#fdc087] text-xs font-semibold uppercase tracking-widest">
-              <Sliders className="w-4 h-4" />
-              <span>Complimentary Personalization</span>
-            </div>
-
-            <h2 className="font-display font-bold text-3xl sm:text-4xl leading-tight text-[#fbf9f4]">
-              Custom Stamping & Logo Engraving
-            </h2>
-
-            <p className="text-xs sm:text-sm text-[#d3c3be] leading-relaxed">
-              Every Al Sumora leather creation can be customized with your choice of leather shade, custom text, name stamping, placement location, or custom logo attachment directly from the product details panel.
-            </p>
-
-            <div className="space-y-3 pt-2 text-xs text-[#fdc087]">
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#fdc087]" />
-                <span>Select from 24k Gold Foil, Sterling Silver, or Deep Debossing</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#fdc087]" />
-                <span>Choose placement position & attach vector logo files</span>
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <button
-                onClick={() => { navigate('/shop'); window.scrollTo(0,0); }}
-                className="bg-[#fdc087] text-[#090100] hover:bg-white py-3.5 px-8 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all flex items-center gap-2 cursor-pointer shadow-lg"
-              >
-                <span>Select a Piece to Customize</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <div className="relative min-h-[320px] bg-[#090100] flex items-center justify-center p-6">
-            <img
-              src={CUSTOMIZATION_IMAGES.goldFoil}
-              alt="Artisan stamping gold foil initial"
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover rounded-lg opacity-90"
-            />
-          </div>
-        </div>
-      </section>
 
       {/* Feature Boxes / Pillars */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

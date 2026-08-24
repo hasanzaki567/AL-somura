@@ -9,7 +9,8 @@ import { AboutView } from './components/AboutView';
 import { ContactView } from './components/ContactView';
 import { ProductDetailView } from './components/ProductDetailView';
 import { BespokeModal } from './components/BespokeModal';
-import { CartDrawer } from './components/CartDrawer';
+import { CartView } from './components/CartView';
+import { WishlistView } from './components/WishlistView';
 import { SearchModal } from './components/SearchModal';
 import { LegalModal } from './components/LegalModal';
 import { AuthView } from './components/AuthView';
@@ -17,18 +18,37 @@ import { CheckoutView } from './components/CheckoutView';
 import { AccountView } from './components/AccountView';
 import { AdminView } from './components/AdminView';
 import { AdminLoginView } from './components/AdminLoginView';
+import { OrderTrackingView } from './components/OrderTrackingView';
 import { useCartStore } from './store/cartStore';
+import { useWishlistStore } from './store/wishlistStore';
 
 export default function App() {
   const navigate = useNavigate();
   
-  // Modals & Drawers state
+  // Modals state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isBespokeOpen, setIsBespokeOpen] = useState(false);
   const [legalModalTab, setLegalModalTab] = useState<'privacy' | 'terms' | null>(null);
 
-  const { cartItems, isCartOpen, setIsCartOpen, addToCart, updateQuantity, removeItem, clearCart } = useCartStore();
+  const { cartItems, isCartOpen, setIsCartOpen, addToCart } = useCartStore();
+  const { isWishlistOpen, setIsWishlistOpen } = useWishlistStore();
   const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  // Automatically redirect to dedicated cart page when item is added
+  useEffect(() => {
+    if (isCartOpen) {
+      setIsCartOpen(false);
+      navigate('/cart');
+    }
+  }, [isCartOpen, setIsCartOpen, navigate]);
+
+  // Automatically redirect to dedicated wishlist page when wishlist store opens
+  useEffect(() => {
+    if (isWishlistOpen) {
+      setIsWishlistOpen(false);
+      navigate('/wishlist');
+    }
+  }, [isWishlistOpen, setIsWishlistOpen, navigate]);
 
   const handleOpenCustomization = () => {
     navigate('/shop');
@@ -84,6 +104,9 @@ export default function App() {
           <Route path="/account" element={<AccountView />} />
           <Route path="/admin" element={<AdminView />} />
           <Route path="/admin-login" element={<AdminLoginView />} />
+          <Route path="/track" element={<OrderTrackingView />} />
+          <Route path="/cart" element={<CartView />} />
+          <Route path="/wishlist" element={<WishlistView />} />
         </Routes>
       </main>
 
@@ -91,15 +114,6 @@ export default function App() {
         setIsBespokeOpen={() => setIsBespokeOpen(true)}
         onOpenPrivacy={() => setLegalModalTab('privacy')}
         onOpenTerms={() => setLegalModalTab('terms')}
-      />
-
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cartItems}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeItem}
-        onClearCart={clearCart}
       />
 
       <SearchModal
@@ -116,9 +130,6 @@ export default function App() {
         onClose={() => setLegalModalTab(null)}
         initialTab={legalModalTab || 'privacy'}
       />
-      
-      {/* BespokeModal requires product/color which isn't managed globally here right now, 
-          assuming it was handled inside views. Will keep as-is if unused at top level. */}
     </div>
   );
 }

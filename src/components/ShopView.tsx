@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product, ProductColor, Category } from '../types';
-import { Filter, ChevronDown, Eye, Sparkles } from 'lucide-react';
+import { Filter, ChevronDown, Eye, Sparkles, Heart } from 'lucide-react';
+import { useWishlistStore } from '../store/wishlistStore';
 
 interface ShopViewProps {
   onSelectProduct: (product: Product) => void;
@@ -23,6 +24,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -199,6 +201,22 @@ export const ShopView: React.FC<ShopViewProps> = ({
                           </span>
                         )}
                       </div>
+
+                      {/* Wishlist Heart Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWishlist(product);
+                        }}
+                        className={`absolute top-3 right-3 p-2 rounded-full shadow transition-all cursor-pointer ${
+                          isInWishlist(product.id)
+                            ? 'bg-[#825425] text-white opacity-100'
+                            : 'bg-white/90 text-[#090100] opacity-80 hover:opacity-100 hover:bg-[#825425] hover:text-white'
+                        }`}
+                        title={isInWishlist(product.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                      >
+                        <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-white' : ''}`} />
+                      </button>
 
                       <button
                         onClick={(e) => {

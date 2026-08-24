@@ -14,9 +14,11 @@ import {
   ChevronRight,
   Award,
   Clock,
-  RotateCcw
+  RotateCcw,
+  Heart,
 } from 'lucide-react';
 import { LeatherCustomizerCanvas } from './LeatherCustomizerCanvas';
+import { useWishlistStore } from '../store/wishlistStore';
 
 interface ProductDetailViewProps {
   product: Product;
@@ -34,6 +36,7 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
   onBack,
   onAddToCart,
 }) => {
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [product]);
@@ -527,6 +530,18 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
                   <span>
                     Add to Shopping Bag • ₹{(product.price * quantity).toLocaleString('en-IN')}
                   </span>
+                </button>
+
+                <button
+                  onClick={() => toggleWishlist(product)}
+                  className={`p-4 rounded-lg border transition-all cursor-pointer flex items-center justify-center ${
+                    isInWishlist(product.id)
+                      ? 'bg-[#825425] text-white border-[#825425] shadow-md'
+                      : 'bg-white text-[#090100] border-[#d3c3be]/60 hover:border-[#825425] hover:bg-[#f0eee9]'
+                  }`}
+                  title={isInWishlist(product.id) ? 'Remove from Saved Wishlist' : 'Save to Wishlist'}
+                >
+                  <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-white' : ''}`} />
                 </button>
               </div>
             </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Package, User as UserIcon, LogOut } from 'lucide-react';
+import { Package, User as UserIcon, LogOut, Truck } from 'lucide-react';
 
 export const AccountView: React.FC = () => {
   const { user, logout } = useAuthStore();
@@ -63,6 +63,12 @@ export const AccountView: React.FC = () => {
               <button className="w-full flex items-center justify-between p-3 bg-[#f5f3ee] text-[#825425] rounded transition-colors text-left">
                 <span className="flex items-center gap-2"><Package className="w-4 h-4" /> Order History</span>
                 <span className="bg-[#825425] text-white text-[10px] px-2 py-0.5 rounded-full">{orders.length}</span>
+              </button>
+              <button
+                onClick={() => navigate('/track')}
+                className="w-full flex items-center gap-2 p-3 text-[#504440] hover:bg-[#f5f3ee] hover:text-[#825425] rounded transition-colors text-left"
+              >
+                <Truck className="w-4 h-4" /> Track Orders
               </button>
               
               <button 

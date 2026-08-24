@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LOGO_IMAGE } from '../data/products';
-import { ShoppingBag, Search, Sparkles, Menu, X, MapPin } from 'lucide-react';
+import { ShoppingBag, Search, Sparkles, Menu, X, MapPin, Heart, User, Truck } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { useWishlistStore } from '../store/wishlistStore';
 
 interface HeaderProps {
   cartCount: number;
@@ -20,6 +21,8 @@ export const Header: React.FC<HeaderProps> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuthStore();
+  const { wishlistItems, setIsWishlistOpen } = useWishlistStore();
+  const wishlistCount = wishlistItems.length;
 
   const navItems = [
     { path: '/', label: 'Home' },
@@ -119,15 +122,15 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right Actions Header */}
         <div className="flex items-center space-x-3 sm:space-x-5">
-          {/* Bespoke Studio Shortcut */}
-          <button
-            onClick={() => setIsBespokeOpen(true)}
+          {/* Track Order Shortcut */}
+          <Link
+            to="/track"
             className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#825425]/40 text-[#825425] hover:bg-[#825425] hover:text-white transition-all text-xs font-semibold tracking-wider uppercase cursor-pointer"
-            title="Open Bespoke Monogramming Studio"
+            title="Track Your Order"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Monogramming</span>
-          </button>
+            <Truck className="w-3.5 h-3.5" />
+            <span>Track Order</span>
+          </Link>
 
           {/* Search Trigger */}
           <button
@@ -139,17 +142,24 @@ export const Header: React.FC<HeaderProps> = ({
             <Search className="w-5 h-5" />
           </button>
 
-          {/* Account/Login Link */}
+          {/* Wishlist Link */}
           <Link
-            to={user ? (user.role === 'admin' ? '/admin' : '/account') : '/login'}
-            className="p-2 text-[#1b1c19] hover:text-[#825425] transition-colors rounded-full hover:bg-[#f0eee9] cursor-pointer hidden sm:flex text-sm font-medium items-center gap-1"
+            to="/wishlist"
+            className="p-2 text-[#1b1c19] hover:text-[#825425] transition-colors relative rounded-full hover:bg-[#f0eee9] cursor-pointer"
+            title="Saved Wishlist"
+            aria-label="Saved Wishlist"
           >
-            {user ? user.name.split(' ')[0] : 'Sign In'}
+            <Heart className={`w-5 h-5 ${wishlistCount > 0 ? 'fill-[#825425] text-[#825425]' : ''}`} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#825425] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {wishlistCount}
+              </span>
+            )}
           </Link>
 
-          {/* Cart Bag Drawer Trigger */}
-          <button
-            onClick={() => setIsCartOpen(true)}
+          {/* Cart Bag Link */}
+          <Link
+            to="/cart"
             className="p-2 text-[#1b1c19] hover:text-[#825425] transition-colors relative rounded-full hover:bg-[#f0eee9] cursor-pointer"
             title="View Shopping Bag"
             aria-label="View Shopping Bag"
@@ -160,7 +170,22 @@ export const Header: React.FC<HeaderProps> = ({
                 {cartCount}
               </span>
             )}
-          </button>
+          </Link>
+
+          {/* Account/Profile Link */}
+          <Link
+            to={user ? (user.role === 'admin' ? '/admin' : '/account') : '/login'}
+            className="p-2 text-[#1b1c19] hover:text-[#825425] transition-colors rounded-full hover:bg-[#f0eee9] cursor-pointer flex text-sm font-medium items-center gap-1.5"
+            title={user ? `Account (${user.name})` : "Sign In"}
+            aria-label={user ? `Account (${user.name})` : "Sign In"}
+          >
+            <User className="w-5 h-5" />
+            {user && (
+              <span className="hidden sm:inline text-xs font-semibold tracking-wide">
+                {user.name.split(' ')[0]}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
 
@@ -188,6 +213,24 @@ export const Header: React.FC<HeaderProps> = ({
               className="text-left text-base font-medium py-2 border-b border-[#e4e2dd]/60 flex items-center justify-between text-[#1b1c19]"
             >
               <span>{user ? 'My Account' : 'Sign In'}</span>
+            </Link>
+
+            <Link
+              to="/wishlist"
+              onClick={() => handleNavClick()}
+              className="text-left text-base font-medium py-2 border-b border-[#e4e2dd]/60 flex items-center justify-between text-[#1b1c19]"
+            >
+              <span>Saved Wishlist</span>
+              {wishlistCount > 0 && <span className="bg-[#825425] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{wishlistCount}</span>}
+            </Link>
+
+            <Link
+              to="/cart"
+              onClick={() => handleNavClick()}
+              className="text-left text-base font-medium py-2 border-b border-[#e4e2dd]/60 flex items-center justify-between text-[#1b1c19]"
+            >
+              <span>Shopping Bag</span>
+              {cartCount > 0 && <span className="bg-[#825425] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{cartCount}</span>}
             </Link>
           </div>
 
