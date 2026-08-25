@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product, ProductColor } from '../types';
-import { PRODUCTS, HERO_SLIDES } from '../data/products';
+import { HERO_SLIDES } from '../data/products';
 import { REVIEWS } from '../data/reviews';
-import { ArrowRight, Sparkles, ShieldCheck, Award, Star, Eye, ShoppingBag, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, Award, Star, Eye, ShoppingBag, ChevronLeft, ChevronRight, Heart, Plus } from 'lucide-react';
 import { useWishlistStore } from '../store/wishlistStore';
+import { useAuthStore } from '../store/authStore';
 import { API_URL } from '../config';
 
 interface HomeViewProps {
@@ -21,6 +22,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [products, setProducts] = useState<any[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -28,18 +31,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
         const res = await fetch(`${API_URL}/api/products?t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
-          setProducts(data);
-        } else {
-          setProducts(PRODUCTS);
+          setProducts(data.map((p: any) => ({ ...p, id: p._id || p.id })));
         }
       } catch (error) {
-        setProducts(PRODUCTS);
+        console.error('Failed to fetch products from database:', error);
       }
     };
     fetchProducts();
   }, []);
 
-  const featuredProducts = products.length > 0 ? products.slice(0, 8) : PRODUCTS.slice(0, 8);
+  // Show products marked as isFeatured from DB; if none are marked, show the first 8
+  const featured = products.filter(p => p.isFeatured);
+  const featuredProducts = featured.length > 0 ? featured.slice(0, 8) : products.slice(0, 8);
 
   // Auto slide interval
   useEffect(() => {
@@ -210,7 +213,33 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+        {featuredProducts.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center py-16 sm:py-24 text-center">
+            <div className="w-20 h-20 rounded-full bg-[#f0eee9] flex items-center justify-center mb-6">
+              <Sparkles className="w-8 h-8 text-[#825425]" />
+            </div>
+            <h3 className="font-display font-bold text-xl sm:text-2xl text-[#090100] mb-2">
+              Coming Soon
+            </h3>
+            <p className="text-xs sm:text-sm text-[#827470] max-w-md leading-relaxed">
+              Our artisans are crafting new masterpieces for this collection. Stay tuned for premium leather goods curated exclusively for you.
+            </p>
+            <div className="mt-6 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-[#825425]">
+              <span className="w-2 h-2 rounded-full bg-[#825425] animate-pulse" />
+              Collection in progress
+            </div>
+            {isAdmin && (
+              <button
+                onClick={() => { navigate('/admin?tab=products&edit=new'); window.scrollTo(0,0); }}
+                className="mt-8 flex items-center gap-2 bg-[#825425] hover:bg-[#090100] text-white px-6 py-3 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer shadow-md"
+              >
+                <Plus className="w-4 h-4" />
+                Add New Product
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {featuredProducts.map((product, idx) => {
             const reviewCount = 42 + ((product.price % 31) + idx * 9) % 55;
             const reviewScore = 4.5 + (idx % 3) * 0.15;
@@ -293,7 +322,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
             );
           })}
-        </div>
+          </div>
+        )}
       </section>
 
 

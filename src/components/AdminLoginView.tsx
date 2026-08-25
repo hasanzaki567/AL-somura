@@ -5,6 +5,7 @@ import { Shield, ArrowRight } from 'lucide-react';
 import { API_URL } from '../config';
 
 export const AdminLoginView: React.FC = () => {
+  const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -13,8 +14,8 @@ export const AdminLoginView: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!password) {
-      setError('Password is required');
+    if (!username || !password) {
+      setError('Username and password are required');
       return;
     }
     setLoading(true);
@@ -24,7 +25,7 @@ export const AdminLoginView: React.FC = () => {
       const res = await fetch(`${API_URL}/api/auth/admin-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ username, password })
       });
       const data = await res.json();
 
@@ -32,7 +33,7 @@ export const AdminLoginView: React.FC = () => {
         login(data);
         navigate('/admin');
       } else {
-        setError(data.message || 'Invalid password');
+        setError(data.message || 'Invalid admin credentials');
       }
     } catch (err) {
       setError('Server connection failed. Please check backend.');
@@ -52,7 +53,7 @@ export const AdminLoginView: React.FC = () => {
             Atelier Administration
           </h2>
           <p className="mt-2 text-sm text-[#827470]">
-            Enter your secure passphrase to access the concierge and atelier portal.
+            Enter your admin username and passphrase to access the concierge portal.
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
@@ -63,12 +64,31 @@ export const AdminLoginView: React.FC = () => {
           )}
           <div className="space-y-4">
             <div>
-              <label htmlFor="password" className="sr-only">Admin Password</label>
+              <label htmlFor="username" className="block text-xs font-semibold text-[#504440] uppercase tracking-wider mb-1">
+                Admin Username or Email
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                autoComplete="username"
+                className="w-full border border-[#d3c3be] px-4 py-3 rounded-lg focus:outline-none focus:border-[#825425] focus:ring-1 focus:ring-[#825425] transition-colors"
+                placeholder="Username or Admin Email"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-xs font-semibold text-[#504440] uppercase tracking-wider mb-1">
+                Passphrase
+              </label>
               <input
                 id="password"
                 name="password"
                 type="password"
                 required
+                autoComplete="current-password"
                 className="w-full border border-[#d3c3be] px-4 py-3 rounded-lg focus:outline-none focus:border-[#825425] focus:ring-1 focus:ring-[#825425] transition-colors"
                 placeholder="Admin Passphrase"
                 value={password}

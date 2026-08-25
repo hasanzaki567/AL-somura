@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import User from './models/User.js';
 import Product from './models/Product.js';
 import { PRODUCTS } from '../src/data/products.js';
@@ -8,7 +10,10 @@ import { PRODUCTS } from '../src/data/products.js';
 // We need to change the extension to .ts when running it via tsx, but PRODUCTS is imported from a .ts file.
 // Since we are running with tsx, we can import from '../src/data/products' directly (tsx resolves it).
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/alsumora';
 
@@ -28,12 +33,13 @@ const seedDatabase = async () => {
     
     await User.create({
       name: 'Admin User',
+      username: 'admin',
       email: 'admin@alsumora.com',
       password: hashedPassword,
       role: 'admin',
       phone: '+442079460912'
     });
-    console.log('Admin user created (admin@alsumora.com / admin123)');
+    console.log('Admin user created (username: admin / admin@alsumora.com / admin123)');
 
     // Insert Products
     const mappedProducts = PRODUCTS.map(p => ({

@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { 
   Plus, Edit2, Trash2, Image as ImageIcon, X, Upload, 
   ArrowLeft, Copy, Check, Briefcase, CreditCard, 
-  ShoppingBag, Sparkles, Grid, Shirt, Footprints, Info, Search
+  ShoppingBag, Sparkles, Grid, Shirt, Footprints, Info, Search, Star, PenTool
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { API_URL } from '../config';
@@ -35,8 +35,10 @@ export const AdminProductsTab: React.FC = () => {
     category: 'Jackets',
     stock: '0',
     images: [] as string[],
+    isFeatured: false,
     isBestSeller: false,
-    isLowStock: false
+    isLowStock: false,
+    customizable: false
   });
 
   useEffect(() => {
@@ -56,8 +58,10 @@ export const AdminProductsTab: React.FC = () => {
           category: existing.category,
           stock: existing.stock.toString(),
           images: existing.images || [],
+          isFeatured: existing.isFeatured || false,
           isBestSeller: existing.isBestSeller || false,
-          isLowStock: existing.isLowStock || false
+          isLowStock: existing.isLowStock || false,
+          customizable: existing.customizable || false
         });
         setActiveImageIndex(0);
       } else if (products.length > 0) {
@@ -73,8 +77,10 @@ export const AdminProductsTab: React.FC = () => {
         category: selectedCategory && selectedCategory !== 'All' ? selectedCategory : 'Jackets',
         stock: '15',
         images: [],
+        isFeatured: false,
         isBestSeller: false,
-        isLowStock: false
+        isLowStock: false,
+        customizable: false
       });
       setActiveImageIndex(0);
     }
@@ -82,13 +88,21 @@ export const AdminProductsTab: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/products?t=${Date.now()}`);
+      const res = await fetch(`${API_URL}/api/products?includeArchived=true&t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
-        setProducts(data);
+        // Normalize products so missing fields in Atlas don't hide items
+        const normalized = data.map((p: any) => ({
+          ...p,
+          category: (p.category && String(p.category).trim()) || 'Jackets',
+          status: p.status || 'active',
+          price: typeof p.price === 'number' ? p.price : Number(p.price || 0),
+          stock: typeof p.stock === 'number' ? p.stock : Number(p.stock || 0)
+        }));
+        setProducts(normalized);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Failed to fetch products from backend:', err);
     } finally {
       setLoading(false);
     }
@@ -107,8 +121,10 @@ export const AdminProductsTab: React.FC = () => {
           category: data.category,
           stock: data.stock.toString(),
           images: data.images || [],
+          isFeatured: data.isFeatured || false,
           isBestSeller: data.isBestSeller || false,
-          isLowStock: data.isLowStock || false
+          isLowStock: data.isLowStock || false,
+          customizable: data.customizable || false
         });
         setActiveImageIndex(0);
       }
@@ -198,7 +214,7 @@ export const AdminProductsTab: React.FC = () => {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
     setUploadingImages(true);
     const newImageUrls: string[] = [];
@@ -217,14 +233,24 @@ export const AdminProductsTab: React.FC = () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user?.token}`
               },
-              body: JSON.stringify({ image: base64 })
+              body: JSON.stringify({ 
+                image: base64,
+                fileName: file.name.split('.')[0]
+              })
             });
-            if (res.ok) {
-              const data = await res.json();
+
+            const data = await res.json();
+
+            if (res.ok && data && data.url) {
+              console.log('Image upload success:', data.url);
               newImageUrls.push(data.url);
+            } else {
+              console.error('Upload error response:', data);
+              alert(`Failed to upload ${file.name}: ${data.message || 'Unknown server error'}`);
             }
-          } catch (err) {
-            console.error('Upload failed', err);
+          } catch (err: any) {
+            console.error('Upload connection error:', err);
+            alert(`Error uploading ${file.name}: ${err.message || 'Network error'}`);
           }
           resolve();
         };
@@ -232,8 +258,11 @@ export const AdminProductsTab: React.FC = () => {
       });
     }
 
-    setForm(prev => ({ ...prev, images: [...prev.images, ...newImageUrls] }));
+    if (newImageUrls.length > 0) {
+      setForm(prev => ({ ...prev, images: [...prev.images, ...newImageUrls] }));
+    }
     setUploadingImages(false);
+    e.target.value = '';
   };
 
   const removeImage = (index: number) => {
@@ -257,7 +286,7 @@ export const AdminProductsTab: React.FC = () => {
   };
 
   const getCategoryCount = (catName: string) => {
-    return products.filter(p => p.category === catName && p.status !== 'archived').length;
+    return products.filter(p => p.category?.trim().toLowerCase() === catName.trim().toLowerCase() && p.status !== 'archived').length;
   };
 
   const getCategoryIcon = (category: string) => {
@@ -594,6 +623,22 @@ export const AdminProductsTab: React.FC = () => {
                   <label className="flex items-start gap-3 cursor-pointer group">
                     <input 
                       type="checkbox"
+                      checked={form.isFeatured}
+                      onChange={e => setForm({...form, isFeatured: e.target.checked})}
+                      className="mt-1 h-4 w-4 rounded border-[#d3c3be] text-[#825425] focus:ring-[#825425] cursor-pointer"
+                    />
+                    <div>
+                      <span className="block text-xs font-semibold text-[#090100] group-hover:text-[#825425] transition-colors flex items-center gap-1.5">
+                        <Star className="w-3.5 h-3.5 text-amber-500" />
+                        Add to Featured Collection
+                      </span>
+                      <span className="block text-[10px] text-[#827470]">Showcases this product in the homepage "Featured Collection" section for premium visibility.</span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-3 cursor-pointer group pt-2 border-t border-[#d3c3be]/30">
+                    <input 
+                      type="checkbox"
                       checked={form.isBestSeller}
                       onChange={e => setForm({...form, isBestSeller: e.target.checked})}
                       className="mt-1 h-4 w-4 rounded border-[#d3c3be] text-[#825425] focus:ring-[#825425] cursor-pointer"
@@ -614,6 +659,22 @@ export const AdminProductsTab: React.FC = () => {
                     <div>
                       <span className="block text-xs font-semibold text-[#090100] group-hover:text-[#825425] transition-colors">Mark as Low Stock</span>
                       <span className="block text-[10px] text-[#827470]">Applies an "Only 3 Left" urgency badge to prompt purchases.</span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-3 cursor-pointer group pt-2 border-t border-[#d3c3be]/30">
+                    <input 
+                      type="checkbox"
+                      checked={form.customizable}
+                      onChange={e => setForm({...form, customizable: e.target.checked})}
+                      className="mt-1 h-4 w-4 rounded border-[#d3c3be] text-[#825425] focus:ring-[#825425] cursor-pointer"
+                    />
+                    <div>
+                      <span className="block text-xs font-semibold text-[#090100] group-hover:text-[#825425] transition-colors flex items-center gap-1.5">
+                        <PenTool className="w-3.5 h-3.5 text-[#825425]" />
+                        Bespoke Customizable
+                      </span>
+                      <span className="block text-[10px] text-[#827470]">Enables the "Personalize" option for monograms and custom finishes.</span>
                     </div>
                   </label>
                 </div>
@@ -648,11 +709,18 @@ export const AdminProductsTab: React.FC = () => {
     
     // Filter active products in category
     const filteredProducts = products.filter(p => {
-      const matchCat = selectedCategory === 'All' || p.category === selectedCategory;
-      const matchSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          p.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          p._id.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchCat && p.status !== 'archived';
+      const pCat = (p.category || '').trim().toLowerCase();
+      const targetCat = selectedCategory.trim().toLowerCase();
+      const matchCat = selectedCategory === 'All' || pCat === targetCat;
+      
+      const searchLower = searchTerm.trim().toLowerCase();
+      const matchSearch = !searchLower || 
+        (p.name && p.name.toLowerCase().includes(searchLower)) ||
+        (p.slug && p.slug.toLowerCase().includes(searchLower)) ||
+        (p._id && p._id.toLowerCase().includes(searchLower)) ||
+        (p.category && p.category.toLowerCase().includes(searchLower));
+
+      return matchCat && matchSearch && p.status !== 'archived';
     });
 
     return (
@@ -725,6 +793,11 @@ export const AdminProductsTab: React.FC = () => {
                      <div>
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-[#1b1c19]">{p.name}</p>
+                        {p.isFeatured && (
+                          <span className="bg-amber-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase flex items-center gap-0.5">
+                            <Star className="w-2.5 h-2.5" /> Featured
+                          </span>
+                        )}
                         {p.isBestSeller && (
                           <span className="bg-[#825425] text-white text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">
                             Best Seller
@@ -786,16 +859,32 @@ export const AdminProductsTab: React.FC = () => {
   // ────────────────────────────────────────────────────────────────────────
   // VIEW 3: CATEGORY SELECTION MENU (DEFAULT SCREEN)
   // ────────────────────────────────────────────────────────────────────────
+  const dbCustomCategories = products
+    .map(p => p.category?.trim())
+    .filter(Boolean)
+    .filter((cat, idx, arr) => arr.findIndex(c => c.toLowerCase() === cat.toLowerCase()) === idx)
+    .filter(cat => !CATEGORIES.some(c => c.toLowerCase() === cat.toLowerCase()));
+
+  const allCategoriesToDisplay = [...CATEGORIES, ...dbCustomCategories];
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold font-display text-[#090100]">Atelier Product Catalog</h2>
-        <p className="text-xs text-[#827470]">Select a collection category below to manage details, pricing, and stock.</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-bold font-display text-[#090100]">Atelier Product Catalog</h2>
+          <p className="text-xs text-[#827470]">Select a collection category below to manage details, pricing, and stock.</p>
+        </div>
+        <button 
+          onClick={() => setCategoryParam('All')} 
+          className="bg-[#090100] text-white px-4 py-2 rounded text-xs font-semibold hover:bg-[#1b1c19] transition-colors"
+        >
+          View All Products ({products.filter(p => p.status !== 'archived').length})
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Category Cards */}
-        {CATEGORIES.map(cat => (
+        {allCategoriesToDisplay.map(cat => (
           <button 
             key={cat}
             onClick={() => setCategoryParam(cat)} 

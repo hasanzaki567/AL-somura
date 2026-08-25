@@ -1,6 +1,7 @@
 import express from 'express';
 import Product from '../models/Product.js';
 import { protect, admin } from '../middleware/auth.js';
+import { uploadImageToImageKit, getAuthenticationParameters } from '../utils/imagekit.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -14,21 +15,42 @@ const router = express.Router();
 // @desc Fetch all products (with optional filtering)
 router.get('/', async (req, res) => {
   try {
-    const { category, search } = req.query;
-    let query = { status: { $ne: 'archived' } };
+    const { category, search, includeArchived } = req.query;
+    let query = {};
+
+    if (includeArchived !== 'true') {
+      query.status = { $ne: 'archived' };
+    }
 
     if (category && category !== 'All') {
-      query.category = category;
+      query.category = { $regex: `^${category.trim()}$`, $options: 'i' };
     }
     
     if (search) {
-      query.name = { $regex: search, $options: 'i' };
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { slug: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } }
+      ];
     }
 
-    const products = await Product.find(query);
+    const products = await Product.find(query).sort({ createdAt: -1 });
+    console.log(`[Products API] Mongo DB Status: Connected. Found ${products.length} products in collection.`);
     res.json(products);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('[Products API] Mongo DB Error:', error.message);
+    res.status(500).json({ message: 'Server error fetching products from database', error: error.message });
+  }
+});
+
+// @route GET /api/products/imagekit-auth
+// @desc Get authentication parameters for direct ImageKit upload
+router.get('/imagekit-auth', (req, res) => {
+  try {
+    const params = getAuthenticationParameters();
+    res.json(params);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to generate ImageKit auth params', error: error.message });
   }
 });
 
@@ -58,24 +80,14 @@ router.get('/:id', async (req, res) => {
 // --- ADMIN ROUTES ---
 
 // @route POST /api/products/upload
-// @desc Upload base64 image
-router.post('/upload', protect, admin, (req, res) => {
+// @desc Upload image via ImageKit CDN (with local fallback)
+router.post('/upload', protect, admin, async (req, res) => {
   try {
-    const { image } = req.body;
+    const { image, fileName } = req.body;
     if (!image) return res.status(400).json({ message: 'No image provided' });
 
-    const matches = image.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
-    if (!matches || matches.length !== 3) {
-      return res.status(400).json({ message: 'Invalid base64 format' });
-    }
-
-    let extension = matches[1] === 'jpeg' ? 'jpg' : matches[1];
-    const data = Buffer.from(matches[2], 'base64');
-    const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}.${extension}`;
-    const filepath = path.join(__dirname, '../uploads', filename);
-
-    fs.writeFileSync(filepath, data);
-    res.json({ url: `http://localhost:5000/uploads/${filename}` });
+    const result = await uploadImageToImageKit(image, fileName || `product_${Date.now()}`, '/products');
+    res.json(result);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

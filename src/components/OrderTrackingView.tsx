@@ -1,65 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
+import { API_URL } from '../config';
 import {
   Package, MapPin, Check, Truck, Clock, ArrowLeft,
   ChevronRight, Search, RotateCcw, Box, Sparkles,
 } from 'lucide-react';
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const MOCK_ORDERS = [
-  {
-    id: 'ALS-88391',
-    trackingNumber: 'TRK-9842-8812-IN',
-    carrier: 'DHL Express Priority',
-    status: 'out_for_delivery',
-    placedOn: 'Aug 21, 2026',
-    total: 49500,
-    itemCount: 2,
-    estimatedDelivery: 'Today by 6:30 PM',
-    shippingAddress: { name: 'Abdur Rahman', line1: '42 Heritage Lane, Bandra West', city: 'Mumbai, MH 400050', phone: '+91 98200 12345' },
-    billingAddress:  { name: 'Abdur Rahman', line1: '42 Heritage Lane, Bandra West', city: 'Mumbai, MH 400050', phone: '+91 98200 12345' },
-    items: [
-      { name: 'Tuscan Cavaliere Briefcase', color: 'Cognac Brown', qty: 1, price: 38500, image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=120&h=120&fit=crop' },
-      { name: 'Heritage Bi-Fold Wallet',   color: 'Matte Black',  qty: 1, price: 11000, image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=120&h=120&fit=crop' },
-    ],
-    steps: [
-      { label: 'Order Placed',        date: 'Aug 21 • 09:15 AM', done: true,    location: 'Al Sumora Online Storefront' },
-      { label: 'Packed & Dispatched', date: 'Aug 21 • 01:40 PM', done: true,    location: 'Mumbai Atelier Hub' },
-      { label: 'In Transit',          date: 'Aug 22 • 05:20 AM', done: true,    location: 'Delhi Air Hub – DHL Express' },
-      { label: 'Out for Delivery',    date: 'Aug 22 • 08:30 AM', done: false,   location: 'Mumbai Local Route #41', active: true },
-      { label: 'Delivered',           date: 'Estimated 6:30 PM', done: false,   location: '42 Heritage Lane' },
-    ],
-  },
-  {
-    id: 'ALS-77402',
-    trackingNumber: 'TRK-3312-9014-IN',
-    carrier: 'Blue Dart Overnight',
-    status: 'delivered',
-    placedOn: 'Aug 14, 2026',
-    total: 62000,
-    itemCount: 1,
-    estimatedDelivery: 'Delivered on Aug 16, 2026',
-    shippingAddress: { name: 'Abdur Rahman', line1: '42 Heritage Lane, Bandra West', city: 'Mumbai, MH 400050', phone: '+91 98200 12345' },
-    billingAddress:  { name: 'Abdur Rahman', line1: '42 Heritage Lane, Bandra West', city: 'Mumbai, MH 400050', phone: '+91 98200 12345' },
-    items: [
-      { name: 'Florentine Leather Jacket', color: 'Deep Mahogany', qty: 1, price: 62000, image: 'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?w=120&h=120&fit=crop' },
-    ],
-    steps: [
-      { label: 'Order Placed',        date: 'Aug 14 • 10:00 AM', done: true, location: 'Al Sumora Online Storefront' },
-      { label: 'Packed & Dispatched', date: 'Aug 14 • 03:00 PM', done: true, location: 'Mumbai Atelier Hub' },
-      { label: 'In Transit',          date: 'Aug 15 • 06:00 AM', done: true, location: 'Bangalore Hub – Blue Dart' },
-      { label: 'Out for Delivery',    date: 'Aug 16 • 09:00 AM', done: true, location: 'Mumbai Local Route #7' },
-      { label: 'Delivered',           date: 'Aug 16 • 02:45 PM', done: true, location: '42 Heritage Lane – Signed by Abdur Rahman' },
-    ],
-  },
-];
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; dot: string }> = {
   out_for_delivery: { label: 'Out for Delivery', color: 'text-amber-700',  bg: 'bg-amber-50  border-amber-200',  dot: 'bg-amber-500' },
+  shipped: { label: 'Shipped', color: 'text-blue-700',  bg: 'bg-blue-50  border-blue-200',  dot: 'bg-blue-500' },
   delivered:        { label: 'Delivered',         color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200', dot: 'bg-emerald-500' },
   in_transit:       { label: 'In Transit',         color: 'text-blue-700',   bg: 'bg-blue-50   border-blue-200',   dot: 'bg-blue-500' },
   processing:       { label: 'Processing',         color: 'text-[#825425]',  bg: 'bg-[#f0eee9] border-[#d3c3be]', dot: 'bg-[#825425]' },
+  pending:          { label: 'Pending',         color: 'text-[#825425]',  bg: 'bg-[#f0eee9] border-[#d3c3be]', dot: 'bg-[#825425]' },
+  cancelled:        { label: 'Cancelled',         color: 'text-red-700', bg: 'bg-red-50 border-red-200', dot: 'bg-red-500' },
 };
+
+export interface OrderData {
+  id: string;
+  trackingNumber: string;
+  carrier: string;
+  status: string;
+  placedOn: string;
+  total: number;
+  itemCount: number;
+  estimatedDelivery: string;
+  shippingAddress: { name: string; line1: string; city: string; phone: string };
+  billingAddress: { name: string; line1: string; city: string; phone: string };
+  items: { name: string; color: string; qty: number; price: number; image: string }[];
+  steps: { label: string; date: string; done: boolean; location: string; active?: boolean }[];
+}
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
@@ -72,7 +44,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   );
 };
 
-const StepTimeline: React.FC<{ steps: typeof MOCK_ORDERS[0]['steps'] }> = ({ steps }) => {
+const StepTimeline: React.FC<{ steps: OrderData['steps'] }> = ({ steps }) => {
   const activeIdx = steps.findIndex(s => s.active) ?? steps.filter(s => s.done).length;
   return (
     <div className="relative flex items-start justify-between gap-0">
@@ -107,7 +79,7 @@ const StepTimeline: React.FC<{ steps: typeof MOCK_ORDERS[0]['steps'] }> = ({ ste
 };
 
 // ─── Detail View ─────────────────────────────────────────────────────────────
-const OrderDetailView: React.FC<{ order: typeof MOCK_ORDERS[0]; onBack: () => void }> = ({ order, onBack }) => {
+const OrderDetailView: React.FC<{ order: OrderData; onBack: () => void }> = ({ order, onBack }) => {
   const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.processing;
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -257,7 +229,7 @@ const OrderDetailView: React.FC<{ order: typeof MOCK_ORDERS[0]; onBack: () => vo
 };
 
 // ─── Order List Card ──────────────────────────────────────────────────────────
-const OrderCard: React.FC<{ order: typeof MOCK_ORDERS[0]; onClick: () => void }> = ({ order, onClick }) => {
+const OrderCard: React.FC<{ order: OrderData; onClick: () => void }> = ({ order, onClick }) => {
   const lastStep = [...order.steps].reverse().find(s => s.done || s.active) ?? order.steps[0];
   return (
     <button
@@ -310,21 +282,96 @@ const OrderCard: React.FC<{ order: typeof MOCK_ORDERS[0]; onClick: () => void }>
 // ─── Main View ────────────────────────────────────────────────────────────────
 export const OrderTrackingView: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [activeFilter, setActiveFilter] = useState<'all' | 'in_transit' | 'delivered'>('all');
-  const [selectedOrder, setSelectedOrder] = useState<typeof MOCK_ORDERS[0] | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [orders, setOrders] = useState<OrderData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = MOCK_ORDERS.filter(o => {
-    if (activeFilter === 'in_transit' && o.status === 'delivered') return false;
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/orders/myorders`, {
+          headers: {
+            'Authorization': `Bearer ${user.token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          
+          const mappedOrders: OrderData[] = data.map((o: any) => {
+            const mappedStatus = o.orderStatus === 'Pending' ? 'pending' 
+              : o.orderStatus === 'Processing' ? 'processing'
+              : o.orderStatus === 'Shipped' ? 'shipped'
+              : o.orderStatus === 'Delivered' ? 'delivered'
+              : o.orderStatus === 'Cancelled' ? 'cancelled'
+              : 'processing';
+            
+            return {
+              id: o._id.slice(-8).toUpperCase(),
+              trackingNumber: `TRK-${o._id.slice(0,8).toUpperCase()}`,
+              carrier: 'Standard Delivery',
+              status: mappedStatus,
+              placedOn: new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              total: o.total,
+              itemCount: o.items?.length || 0,
+              estimatedDelivery: o.orderStatus === 'Delivered' ? `Delivered on ${new Date(o.updatedAt).toLocaleDateString()}` : 'Estimated in 3-5 days',
+              shippingAddress: {
+                name: o.customerInfo?.name || user.name,
+                line1: o.shippingAddress?.address || '',
+                city: o.shippingAddress?.city || '',
+                phone: o.customerInfo?.phone || ''
+              },
+              billingAddress: {
+                name: o.customerInfo?.name || user.name,
+                line1: o.shippingAddress?.address || '',
+                city: o.shippingAddress?.city || '',
+                phone: o.customerInfo?.phone || ''
+              },
+              items: o.items ? o.items.map((item: any) => ({
+                name: item.productNameSnapshot,
+                color: item.selectedColor?.name || 'Standard',
+                qty: item.quantity,
+                price: item.priceSnapshot,
+                image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=120&h=120&fit=crop'
+              })) : [],
+              steps: [
+                { label: 'Order Placed', date: new Date(o.createdAt).toLocaleDateString(), done: true, location: 'Al Sumora Store' },
+                { label: 'Processing', date: o.orderStatus !== 'Pending' ? new Date(o.updatedAt).toLocaleDateString() : 'Pending', done: o.orderStatus !== 'Pending', location: 'Atelier Hub' },
+                { label: 'Shipped', date: ['Shipped', 'Delivered'].includes(o.orderStatus) ? new Date(o.updatedAt).toLocaleDateString() : 'Pending', done: ['Shipped', 'Delivered'].includes(o.orderStatus), location: 'Carrier Hub' },
+                { label: 'Delivered', date: o.orderStatus === 'Delivered' ? new Date(o.updatedAt).toLocaleDateString() : 'Estimated', done: o.orderStatus === 'Delivered', location: o.shippingAddress?.city || 'Destination' }
+              ]
+            };
+          });
+          setOrders(mappedOrders);
+        }
+      } catch (err) {
+        console.error('Failed to fetch orders', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [user, navigate]);
+
+  const filtered = orders.filter(o => {
+    if (activeFilter === 'in_transit' && (o.status === 'delivered' || o.status === 'cancelled')) return false;
     if (activeFilter === 'delivered' && o.status !== 'delivered') return false;
     if (searchQuery && !o.id.toLowerCase().includes(searchQuery.toLowerCase()) && !o.trackingNumber.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
   });
 
   const tabs: { key: typeof activeFilter; label: string; count: number }[] = [
-    { key: 'all',         label: 'All Orders',   count: MOCK_ORDERS.length },
-    { key: 'in_transit',  label: 'In Transit',   count: MOCK_ORDERS.filter(o => o.status !== 'delivered').length },
-    { key: 'delivered',   label: 'Delivered',    count: MOCK_ORDERS.filter(o => o.status === 'delivered').length },
+    { key: 'all',         label: 'All Orders',   count: orders.length },
+    { key: 'in_transit',  label: 'In Transit',   count: orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').length },
+    { key: 'delivered',   label: 'Delivered',    count: orders.filter(o => o.status === 'delivered').length },
   ];
 
   return (
@@ -386,7 +433,12 @@ export const OrderTrackingView: React.FC = () => {
             </div>
 
             {/* Order List */}
-            {filtered.length === 0 ? (
+            {loading ? (
+              <div className="bg-white rounded-2xl border border-[#d3c3be]/40 p-16 text-center shadow-sm">
+                <div className="animate-spin w-10 h-10 border-4 border-[#825425] border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="font-display font-bold text-lg text-[#090100]">Loading Orders...</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="bg-white rounded-2xl border border-[#d3c3be]/40 p-16 text-center shadow-sm">
                 <div className="w-16 h-16 rounded-full bg-[#f0eee9] flex items-center justify-center mx-auto mb-4">
                   <RotateCcw className="w-7 h-7 text-[#d3c3be]" />

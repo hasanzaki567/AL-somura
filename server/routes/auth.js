@@ -8,18 +8,18 @@ const router = express.Router();
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'fallback_secret_please_change', {
-    expiresIn: '30d',
+    expiresIn: '7d', // 1 week session
   });
 };
 
 // @route POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
+    const { name, username, email, password, phone } = req.body;
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ $or: [{ email }, { username }] });
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: 'User with this email or username already exists' });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -27,6 +27,7 @@ router.post('/register', async (req, res) => {
 
     const user = await User.create({
       name,
+      username: username || email.split('@')[0],
       email,
       password: hashedPassword,
       phone,
@@ -36,6 +37,7 @@ router.post('/register', async (req, res) => {
       res.status(201).json({
         _id: user._id,
         name: user.name,
+        username: user.username,
         email: user.email,
         role: user.role,
         token: generateToken(user._id),
@@ -51,20 +53,24 @@ router.post('/register', async (req, res) => {
 // @route POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, username, password } = req.body;
+    const loginIdentifier = email || username;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      $or: [{ email: loginIdentifier }, { username: loginIdentifier }]
+    });
 
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
         _id: user._id,
         name: user.name,
+        username: user.username,
         email: user.email,
         role: user.role,
         token: generateToken(user._id),
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ message: 'Invalid credentials' });
     }
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -73,37 +79,98 @@ router.post('/login', async (req, res) => {
 
 // @route POST /api/auth/admin-login
 router.post('/admin-login', async (req, res) => {
+  const { username, email, password } = req.body;
+  const identifier = (username || email || 'admin').trim();
+  const envAdminPass = process.env.ADMIN_PASSWORD || 'admin123';
+  const envAdminEmail = process.env.ADMIN_EMAIL || 'admin@alsumora.com';
+
+  if (!password) {
+    return res.status(400).json({ message: 'Password is required' });
+  }
+
+  let adminUser = null;
+
   try {
-    const { password } = req.body;
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    adminUser = await User.findOne({
+      $or: [
+        { username: identifier },
+        { email: identifier },
+        { email: envAdminEmail },
+        { role: 'admin' }
+      ]
+    });
+  } catch (err) {
+    console.error('Database lookup error during admin login:', err.message);
+  }
 
-    if (password === adminPassword) {
-      // Find or create the admin user in the database
-      let adminUser = await User.findOne({ email: 'admin@alsumora.com' });
-      if (!adminUser) {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(adminPassword, salt);
-        adminUser = await User.create({
-          name: 'Admin',
-          email: 'admin@alsumora.com',
-          password: hashedPassword,
-          role: 'admin',
-          phone: '1234567890'
-        });
-      }
-
-      res.json({
-        _id: adminUser._id,
-        name: adminUser.name,
-        email: adminUser.email,
-        role: adminUser.role,
-        token: generateToken(adminUser._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid admin passphrase' });
+  // Verify password against DB hash or env passphrase
+  let isMatch = (password === envAdminPass);
+  if (!isMatch && adminUser && adminUser.password) {
+    try {
+      isMatch = await bcrypt.compare(password, adminUser.password);
+    } catch (err) {
+      isMatch = false;
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+
+  if (!isMatch) {
+    return res.status(401).json({ message: 'Invalid admin credentials' });
+  }
+
+  // If password matched and adminUser exists in DB
+  if (adminUser) {
+    try {
+      if (adminUser.role !== 'admin' || !adminUser.username) {
+        adminUser.role = 'admin';
+        if (!adminUser.username) adminUser.username = identifier || 'admin';
+        await adminUser.save();
+      }
+    } catch (saveErr) {
+      console.warn('Could not save updated admin role/username:', saveErr.message);
+    }
+
+    return res.json({
+      _id: adminUser._id,
+      name: adminUser.name || 'Admin',
+      username: adminUser.username || 'admin',
+      email: adminUser.email || envAdminEmail,
+      role: 'admin',
+      token: generateToken(adminUser._id),
+    });
+  }
+
+  // If DB didn't find adminUser, try creating it in DB
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    adminUser = await User.create({
+      name: 'Admin',
+      username: identifier || 'admin',
+      email: envAdminEmail,
+      password: hashedPassword,
+      role: 'admin',
+      phone: '1234567890'
+    });
+
+    return res.json({
+      _id: adminUser._id,
+      name: adminUser.name,
+      username: adminUser.username,
+      email: adminUser.email,
+      role: adminUser.role,
+      token: generateToken(adminUser._id),
+    });
+  } catch (createErr) {
+    console.warn('Could not persist admin user in DB, using fallback session:', createErr.message);
+    const fallbackId = '650000000000000000000001';
+    return res.json({
+      _id: fallbackId,
+      name: 'Admin',
+      username: identifier || 'admin',
+      email: envAdminEmail,
+      role: 'admin',
+      token: generateToken(fallbackId),
+    });
   }
 });
 

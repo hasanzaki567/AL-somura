@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product, ProductColor, Category } from '../types';
-import { Filter, ChevronDown, Eye, Sparkles, Heart } from 'lucide-react';
+import { Filter, ChevronDown, Eye, Sparkles, Heart, Plus } from 'lucide-react';
 import { useWishlistStore } from '../store/wishlistStore';
+import { useAuthStore } from '../store/authStore';
 import { API_URL } from '../config';
 
 interface ShopViewProps {
@@ -26,6 +27,8 @@ export const ShopView: React.FC<ShopViewProps> = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -46,21 +49,18 @@ export const ShopView: React.FC<ShopViewProps> = ({
         if (activeCategory !== 'All') queryParams.append('category', activeCategory);
         if (search) queryParams.append('search', search);
 
-        // Fetch from new backend API
+        // Fetch from MongoDB backend API
         const res = await fetch(`${API_URL}/api/products?${queryParams}&t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
-          // Transform _id to id if necessary, but we'll map it inline
           setProducts(data.map((p: any) => ({ ...p, id: p._id || p.id })));
         } else {
-          // Fallback if backend isn't up
-          const { PRODUCTS } = await import('../data/products');
-          setProducts(PRODUCTS);
+          console.error('Failed to fetch products from database');
+          setProducts([]);
         }
       } catch (error) {
-        // Fallback for development if express server isn't running
-        const { PRODUCTS } = await import('../data/products');
-        setProducts(PRODUCTS);
+        console.error('Failed to connect to database:', error);
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -157,6 +157,29 @@ export const ShopView: React.FC<ShopViewProps> = ({
                 {[1, 2, 3, 4, 5, 6].map(i => (
                   <div key={i} className="animate-pulse bg-white rounded-xl border border-[#e8e0d8] aspect-[3/4]"></div>
                 ))}
+              </div>
+            ) : products.length === 0 ? (
+              <div className="bg-white rounded-xl border border-[#d3c3be]/40 p-10 sm:p-20 text-center shadow-sm">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#f0eee9] flex items-center justify-center mx-auto text-[#825425] mb-6">
+                  <Sparkles className="w-7 h-7 sm:w-9 sm:h-9" />
+                </div>
+                <h3 className="font-display font-bold text-xl sm:text-2xl text-[#090100] mb-2">Coming Soon</h3>
+                <p className="text-xs sm:text-sm text-[#827470] max-w-md mx-auto leading-relaxed">
+                  Our atelier is preparing an exclusive collection of premium leather goods. Check back soon for handcrafted masterpieces.
+                </p>
+                <div className="mt-6 flex items-center justify-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-[#825425]">
+                  <span className="w-2 h-2 rounded-full bg-[#825425] animate-pulse" />
+                  Collection in progress
+                </div>
+                {isAdmin && (
+                  <button
+                    onClick={() => { navigate('/admin?tab=products&edit=new'); window.scrollTo(0,0); }}
+                    className="mt-8 flex items-center gap-2 bg-[#825425] hover:bg-[#090100] text-white px-6 py-3 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer shadow-md"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add New Product
+                  </button>
+                )}
               </div>
             ) : filteredAndSortedProducts.length === 0 ? (
               <div className="bg-white rounded-xl border border-[#d3c3be]/40 p-8 sm:p-16 text-center shadow-sm">
