@@ -15,9 +15,15 @@ const __dirname = path.dirname(__filename);
 // Load .env from server directory
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
+if (!process.env.VERCEL) {
+  try {
+    const uploadsDir = path.join(__dirname, 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+  } catch (err) {
+    console.warn('Skipping local uploads directory creation:', err.message);
+  }
 }
 
 const app = express();
@@ -37,9 +43,12 @@ const connectDB = async () => {
     isConnected = db.connections[0].readyState === 1;
     console.log('MongoDB connected successfully to:', MONGO_URI.replace(/\/\/.*@/, '//***@'));
   } catch (err) {
-    console.error('MongoDB connection error:', err);
+    console.error('MongoDB connection error:', err.message);
   }
 };
+
+// Connect immediately on startup
+connectDB();
 
 // Database Connection Middleware for Serverless & Local
 app.use(async (req, res, next) => {

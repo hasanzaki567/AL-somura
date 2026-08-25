@@ -89,6 +89,11 @@ function saveToLocalStorage(image, fileName) {
     const cleanFileName = (fileName || `prod_${Date.now()}`).replace(/[^a-zA-Z0-9_-]/g, '_');
     const name = `${cleanFileName}_${Date.now()}.${extension}`;
     
+    if (process.env.VERCEL) {
+      // In Vercel serverless environment, filesystem is read-only
+      return { url: image, isLocal: false };
+    }
+
     const uploadsDir = path.resolve(process.cwd(), 'server/uploads');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
