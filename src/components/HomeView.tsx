@@ -20,6 +20,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 }) => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
+  const [banners, setBanners] = useState<any[]>(HERO_SLIDES);
   const [currentSlide, setCurrentSlide] = useState(0);
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const { user } = useAuthStore();
@@ -38,6 +39,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
       }
     };
     fetchProducts();
+
+    const fetchBanners = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/banners?t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) {
+            setBanners(data);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch banners, using defaults:', error);
+      }
+    };
+    fetchBanners();
   }, []);
 
   // Show products marked as isFeatured from DB; if none are marked, show the first 8
@@ -47,27 +63,27 @@ export const HomeView: React.FC<HomeViewProps> = ({
   // Auto slide interval
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [banners.length]);
 
   const handleNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    setCurrentSlide((prev) => (prev + 1) % banners.length);
   };
 
   const handlePrevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
   };
 
-  const slide = HERO_SLIDES[currentSlide];
+  const slide = banners[currentSlide] || HERO_SLIDES[0];
 
   return (
     <div className="space-y-20 pb-20">
       {/* Moving Hero Carousel Section */}
       <section className="relative min-h-[50vh] sm:min-h-[82vh] flex items-center bg-[#090100] overflow-hidden text-white group">
         {/* Carousel Slide Images with Cross-Fade */}
-        {HERO_SLIDES.map((s, idx) => (
+        {banners.map((s, idx) => (
           <div
             key={s.id}
             className={`absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out ${
@@ -134,7 +150,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
         {/* Slide Indicators / Dots */}
         <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
-          {HERO_SLIDES.map((_, idx) => (
+          {banners.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Users, Package, LayoutDashboard, Settings, LogOut, ArrowRight } from 'lucide-react';
+import { Users, Package, LayoutDashboard, Settings, LogOut, ArrowRight, Image } from 'lucide-react';
 import { API_URL } from '../config';
 
 import { AdminProductsTab } from './AdminProductsTab';
+import { AdminBannersTab } from './AdminBannersTab';
 
 export const AdminView: React.FC = () => {
   const { user, logout } = useAuthStore();
@@ -109,6 +110,7 @@ export const AdminView: React.FC = () => {
             { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
             { id: 'orders', label: 'Orders', icon: Package },
             { id: 'products', label: 'Products', icon: Settings },
+            { id: 'banners', label: 'Banners', icon: Image },
             { id: 'customers', label: 'Customers', icon: Users }
           ].map(tab => (
             <button
@@ -231,6 +233,10 @@ export const AdminView: React.FC = () => {
 
             {activeTab === 'products' && (
               <AdminProductsTab />
+            )}
+
+            {activeTab === 'banners' && (
+              <AdminBannersTab />
             )}
 
             {activeTab === 'customers' && (

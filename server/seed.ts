@@ -5,7 +5,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import User from './models/User.js';
 import Product from './models/Product.js';
+import Banner from './models/Banner.js';
 import { PRODUCTS } from '../src/data/products.js';
+import { HERO_SLIDES } from '../src/data/products.js';
 
 // We need to change the extension to .ts when running it via tsx, but PRODUCTS is imported from a .ts file.
 // Since we are running with tsx, we can import from '../src/data/products' directly (tsx resolves it).
@@ -25,6 +27,7 @@ const seedDatabase = async () => {
     // Clear existing data (Be careful in production! We only do this initially)
     await User.deleteMany();
     await Product.deleteMany();
+    await Banner.deleteMany();
     console.log('Cleared existing data');
 
     // Create Admin User
@@ -62,6 +65,19 @@ const seedDatabase = async () => {
 
     await Product.insertMany(mappedProducts);
     console.log(`Inserted ${mappedProducts.length} products`);
+
+    // Insert Banners from HERO_SLIDES
+    const mappedBanners = HERO_SLIDES.map((slide, idx) => ({
+      title: slide.title,
+      subtitle: slide.subtitle,
+      description: slide.description,
+      image: slide.image,
+      tag: slide.tag,
+      order: idx + 1
+    }));
+
+    await Banner.insertMany(mappedBanners);
+    console.log(`Inserted ${mappedBanners.length} banners`);
 
     console.log('Database Seeding Complete!');
     process.exit();

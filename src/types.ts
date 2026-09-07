@@ -62,4 +62,14 @@ export interface Review {
   verified: boolean;
 }
 
+export interface Banner {
+  _id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string;
+  tag: string;
+  order: number;
+}
+
 export type ActiveTab = 'home' | 'shop' | 'about' | 'contact';
