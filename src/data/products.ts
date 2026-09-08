@@ -8,32 +8,8 @@ export const HERO_SLIDES = [
     title: 'Elite Craftsmanship, Timeless Style.',
     subtitle: 'MAISON DE CUIR • SINCE 1984',
     description: 'Each Al Sumora creation is individually hand-cut, saddle-stitched, and burnished in our European ateliers using full-grain Tuscan leather.',
-    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1600',
+    image: '/banner.png',
     tag: 'Luxury Leather Jackets',
-  },
-  {
-    id: 2,
-    title: 'Master Hand-Welted Footwear.',
-    subtitle: 'SARTORIAL FOOTWEAR ATELIER',
-    description: 'Crafted with Goodyear welted construction, hand-dyed patina finish, and full-grain calfskin for generational longevity and supreme comfort.',
-    image: 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?auto=format&fit=crop&q=80&w=1600',
-    tag: 'Fine Leather Footwear',
-  },
-  {
-    id: 3,
-    title: 'Architectural Executive Briefcases.',
-    subtitle: 'BUSINESS & ATTACHÉ COLLECTION',
-    description: 'Engineered with solid antique brass hardware, suede lining, and dedicated padded compartments for the modern professional.',
-    image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=1600',
-    tag: 'Executive Briefcases',
-  },
-  {
-    id: 4,
-    title: 'The Art of Grand Travel.',
-    subtitle: 'HERITAGE VOYAGER Duffels',
-    description: 'Spacious weekenders forged from thick vegetable-tanned hides that acquire a majestic patina through decades of global travel.',
-    image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=1600',
-    tag: 'Travel Duffels & Bags',
   },
 ];
 
