@@ -111,16 +111,8 @@ export const Header: React.FC<HeaderProps> = ({
               src={LOGO_IMAGE}
               alt="Al Sumora Heritage Logo"
               referrerPolicy="no-referrer"
-              className="h-8 sm:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-14 sm:h-34 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="flex flex-col">
-              <span className="font-display font-bold text-sm sm:text-2xl tracking-wider text-[#090100] uppercase leading-none">
-                AL SUMORA
-              </span>
-              <span className="text-[7px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.25em] text-[#825425] uppercase font-semibold mt-0.5 leading-none">
-                HERITAGE • PARIS
-              </span>
-            </div>
           </Link>
         </div>
 
@@ -133,11 +125,10 @@ export const Header: React.FC<HeaderProps> = ({
                 key={item.path}
                 to={item.path}
                 onClick={() => handleNavClick()}
-                className={`relative py-2 text-sm font-medium transition-colors cursor-pointer ${
-                  isActive
-                    ? 'text-[#090100] font-semibold'
-                    : 'text-[#504440] hover:text-[#825425]'
-                }`}
+                className={`relative py-2 text-sm font-medium transition-colors cursor-pointer ${isActive
+                  ? 'text-[#090100] font-semibold'
+                  : 'text-[#504440] hover:text-[#825425]'
+                  }`}
               >
                 {item.label}
                 {isActive && (
@@ -228,15 +219,14 @@ export const Header: React.FC<HeaderProps> = ({
                 key={item.path}
                 to={item.path}
                 onClick={() => handleNavClick()}
-                className={`text-left text-base font-medium py-2 border-b border-[#e4e2dd]/60 flex items-center justify-between ${
-                  location.pathname === item.path ? 'text-[#825425] font-semibold' : 'text-[#1b1c19]'
-                }`}
+                className={`text-left text-base font-medium py-2 border-b border-[#e4e2dd]/60 flex items-center justify-between ${location.pathname === item.path ? 'text-[#825425] font-semibold' : 'text-[#1b1c19]'
+                  }`}
               >
                 <span>{item.label}</span>
                 {location.pathname === item.path && <span className="w-2 h-2 rounded-full bg-[#825425]" />}
               </Link>
             ))}
-            
+
             <Link
               to={user ? (user.role === 'admin' ? '/admin' : '/account') : '/login'}
               onClick={() => handleNavClick()}

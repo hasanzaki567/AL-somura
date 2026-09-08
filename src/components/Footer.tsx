@@ -28,12 +28,12 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) =>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-6 md:gap-8 pb-6 sm:pb-8">
           {/* Brand Info & Social Media Links */}
           <div className="space-y-2 col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <img
                 src={LOGO_IMAGE}
                 alt="Al Sumora Logo"
                 referrerPolicy="no-referrer"
-                className="h-6 sm:h-8 w-auto object-contain brightness-200"
+                className="h-9 sm:h-12 w-auto object-contain"
               />
               <span className="font-display font-bold text-sm sm:text-base tracking-wider text-white">
                 AL SUMORA

@@ -1,6 +1,6 @@
 import { Product } from '../types';
 
-export const LOGO_IMAGE = "https://lh3.googleusercontent.com/aida-public/AB6AXuCU_sXGvK1YTi9vOdA7pXAWKvSkORzK_FtM3MkCLvtH1dT1CX1uZWzu4R-S06GFG01a3T14_03m11KA6_ZACI4Yoarp__igkWMwym1RzDA2zWXj0xW_Gdm39d1cuesOvnTlTArNbFwCpRVI2P8g0FFKAf2_HR__lCwuQDJXtByEqqNKiO_VfYSq9UO__FNeNScSrG_DZijuhp42TCasWbDqRI_lwCq2SM_i4gPihgnBQOGBzeHpw-CfYA";
+export const LOGO_IMAGE = "/logo.png";
 
 export const HERO_SLIDES = [
   {
