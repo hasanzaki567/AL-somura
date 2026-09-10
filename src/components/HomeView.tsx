@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product, ProductColor } from '../types';
 import { HERO_SLIDES } from '../data/products';
-import { REVIEWS } from '../data/reviews';
-import { ArrowRight, Sparkles, ShieldCheck, Award, Star, Eye, ShoppingBag, ChevronLeft, ChevronRight, Heart, Plus } from 'lucide-react';
+
+import { ArrowRight, Sparkles, ShieldCheck, Award, Eye, ShoppingBag, ChevronLeft, ChevronRight, Heart, Plus } from 'lucide-react';
 import { useWishlistStore } from '../store/wishlistStore';
 import { useAuthStore } from '../store/authStore';
 import { API_URL } from '../config';
@@ -387,48 +387,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* Client Experiences / Reviews */}
-      <section className="bg-[#f5f3ee] py-16 border-y border-[#d3c3be]/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-xl mx-auto mb-12">
-            <span className="text-xs font-semibold uppercase tracking-widest text-[#825425]">
-              Client Testimonials
-            </span>
-            <h2 className="font-display font-bold text-3xl text-[#090100] mt-1">
-              Client Experiences
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {REVIEWS.map((rev) => (
-              <div key={rev.id} className="bg-white p-6 rounded-xl border border-[#d3c3be]/40 space-y-4 shadow-xs flex flex-col justify-between">
-                <div>
-                  <div className="flex gap-1 text-[#825425] mb-3">
-                    {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current text-[#fdc087]" />
-                    ))}
-                  </div>
-                  <p className="text-xs text-[#1b1c19] italic leading-relaxed">
-                    "{rev.quote}"
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-[#f0eee9] flex items-center justify-between">
-                  <div>
-                    <div className="font-display font-semibold text-xs text-[#090100]">
-                      {rev.clientName}
-                    </div>
-                    <div className="text-[10px] text-[#827470]">{rev.location}</div>
-                  </div>
-                  <span className="text-[10px] font-semibold text-[#825425] bg-[#f0eee9] px-2 py-0.5 rounded">
-                    Verified Buyer
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
