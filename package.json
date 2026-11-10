@@ -22,6 +22,7 @@
     "dotenv": "^17.4.2",
     "express": "^4.22.2",
     "fabric": "^7.4.0",
+    "google-auth-library": "^11.3.4",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.546.0",
     "mongoose": "^9.9.1",

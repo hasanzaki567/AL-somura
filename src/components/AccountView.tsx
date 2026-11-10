@@ -51,8 +51,12 @@ export const AccountView: React.FC = () => {
         <div className="w-full md:w-1/4">
           <div className="bg-white p-6 rounded-xl border border-[#d3c3be]/40 shadow-sm space-y-6 sticky top-24">
             <div className="flex items-center gap-4 border-b border-[#d3c3be]/40 pb-6">
-              <div className="w-12 h-12 rounded-full bg-[#f0eee9] flex items-center justify-center text-[#825425]">
-                <UserIcon className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-full bg-[#f0eee9] flex items-center justify-center text-[#825425] overflow-hidden">
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <UserIcon className="w-6 h-6" />
+                )}
               </div>
               <div>
                 <h2 className="font-display font-semibold text-lg">{user.name}</h2>

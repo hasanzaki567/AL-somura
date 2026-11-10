@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
+import { GoogleLoginButton } from './GoogleLoginButton';
 import { API_URL } from '../config';
 
 export const AuthView: React.FC = () => {
@@ -125,11 +126,28 @@ export const AuthView: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#090100] text-white py-3 rounded text-sm font-semibold tracking-wide uppercase hover:bg-[#825425] transition-colors disabled:opacity-50 mt-4"
+            className="w-full bg-[#090100] text-white py-3 rounded text-sm font-semibold tracking-wide uppercase hover:bg-[#825425] transition-colors disabled:opacity-50 mt-4 cursor-pointer"
           >
             {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
           </button>
         </form>
+
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-[#d3c3be]/40" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white px-3 text-[#827470]">Or continue with</span>
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <GoogleLoginButton 
+            text={isLogin ? 'signin_with' : 'signup_with'}
+            width={380}
+            onError={(errMsg) => setError(errMsg)}
+          />
+        </div>
 
         <div className="mt-6 text-center text-sm text-[#504440]">
           {isLogin ? "Don't have an account? " : "Already have an account? "}
