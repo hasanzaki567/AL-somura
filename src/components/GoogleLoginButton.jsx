@@ -4,8 +4,6 @@ import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
 import { API_URL } from '../config';
 
-const DEFAULT_CLIENT_ID = '15221582038-eos3mv6poo24kcj4k9lm3fanoaldqkjn.apps.googleusercontent.com';
-
 /**
  * Reusable Google Login Button using Google Identity Services (GIS).
  * 
@@ -35,9 +33,7 @@ export const GoogleLoginButton = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const clientId = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GOOGLE_CLIENT_ID)
-    ? import.meta.env.VITE_GOOGLE_CLIENT_ID
-    : DEFAULT_CLIENT_ID;
+  const clientId = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GOOGLE_CLIENT_ID) || '';
 
   const handleCredentialResponse = async (response) => {
     if (!response || !response.credential) {
@@ -95,7 +91,7 @@ export const GoogleLoginButton = ({
     let isMounted = true;
 
     const initGsi = () => {
-      if (!isMounted || !buttonRef.current) return;
+      if (!isMounted || !buttonRef.current || !clientId) return;
 
       const google = window.google;
       if (google && google.accounts && google.accounts.id) {

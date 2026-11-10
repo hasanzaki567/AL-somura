@@ -7,9 +7,6 @@ import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '15221582038-eos3mv6poo24kcj4k9lm3fanoaldqkjn.apps.googleusercontent.com';
-const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
-
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'fallback_secret_please_change', {
     expiresIn: '7d', // 1 week session
@@ -20,6 +17,12 @@ const generateToken = (id) => {
 // @desc Verify Google Identity Services ID Token and login/register user
 router.post('/google', async (req, res) => {
   try {
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    if (!googleClientId) {
+      console.error('Missing GOOGLE_CLIENT_ID in server environment variables');
+      return res.status(500).json({ message: 'Google authentication is not configured on the server' });
+    }
+
     const { credential, token } = req.body;
     const idToken = credential || token;
 
@@ -30,9 +33,10 @@ router.post('/google', async (req, res) => {
     // Verify Google ID token securely using google-auth-library
     let ticket;
     try {
+      const googleClient = new OAuth2Client(googleClientId);
       ticket = await googleClient.verifyIdToken({
         idToken,
-        audience: GOOGLE_CLIENT_ID,
+        audience: googleClientId,
       });
     } catch (verifyError) {
       console.error('Google token verification failed:', verifyError.message);
@@ -178,8 +182,8 @@ router.post('/login', async (req, res) => {
 router.post('/admin-login', async (req, res) => {
   const { username, email, password } = req.body;
   const identifier = (username || email || 'admin').trim();
-  const envAdminPass = process.env.ADMIN_PASSWORD || 'admin123';
-  const envAdminEmail = process.env.ADMIN_EMAIL || 'admin@alsumora.com';
+  const envAdminPass = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV !== 'production' ? 'admin123' : null);
+  const envAdminEmail = process.env.ADMIN_EMAIL || (process.env.NODE_ENV !== 'production' ? 'admin@alsumora.com' : null);
 
   if (!password) {
     return res.status(400).json({ message: 'Password is required' });
