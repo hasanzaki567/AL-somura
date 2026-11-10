@@ -43,6 +43,9 @@ export const CheckoutView: React.FC = () => {
     try {
       const formattedItems = cartItems.map(item => ({
         productId: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        image: (item.selectedColor && item.selectedColor.image) || (item.product.images && item.product.images[0]) || '',
         quantity: item.quantity,
         selectedColor: item.selectedColor,
         monogram: item.monogram
